@@ -1,65 +1,35 @@
-# Publicar "Constructor de Números" en GitHub Pages
-
-He separado el HTML, CSS y JS en `docs/` para que puedas publicar fácilmente con GitHub Pages.
-
-Estructura creada en `/Downloads/docs/`:
-- `index.html`
-- `css/style.css`
-- `js/script.js`
-
-Pasos mínimos para publicar (desde una terminal en la carpeta donde quieres inicializar el repo):
-
-```bash
-git init
-git add docs index.html README.md docs/css/style.css docs/js/script.js
-git commit -m "Add numero constructor site"
-git branch -M main
-git remote add origin https://github.com/pastorduran/numero-constructor.git
-git push -u origin main
-```
-
-Luego en GitHub (repo `numero-constructor`) ve a Settings → Pages y selecciona la rama `main` y la carpeta `/docs` como source. Tras unos minutos el sitio estará disponible en:
-
-`https://pastorduran.github.io/numero-constructor/`
-
-Notas:
-- Si prefieres publicar desde la raíz en vez de `docs/`, mueve los archivos al root del repo y selecciona `main / root` en Pages.
-- Para desactivar/activar sonido en el sitio, puedo añadir un interruptor UI que guarde la preferencia en `localStorage`.
+# Constructor de Números
 
 Descripción del proyecto
 ------------------------
 
-"Constructor de Números" es una aplicación educativa interactiva diseñada para ayudar a niños y niñas a comprender el valor posicional y la descomposición de números usando billetes y monedas. La interfaz permite apilar dinero por columnas (millones, cien-miles, diez-miles, miles, centenas, decenas y unidades), ajustar cantidades con controles +/−, y ver el número resultante en formato total, descomposición y notación con potencias de 10.
+"Constructor de Números" es una aplicación educativa interactiva diseñada para ayudar a niñas y niños a comprender el valor posicional y la descomposición de números usando billetes y monedas. La interfaz permite apilar dinero por columnas (millones, cien-miles, diez-miles, miles, centenas, decenas y unidades), ajustar cantidades con controles +/−, y ver el número resultante en formato total, descomposición y notación con potencias de 10.
 
-Objetivos educativos
---------------------
-
-- Reforzar el concepto de valor posicional: cómo cada columna (millones, centenas, decenas, unidades) contribuye al total.
-- Practicar la descomposición de números en sumas de múltiplos de potencias de 10 (por ejemplo, 6×10⁶ + 2×10³ + ...).
-- Visualizar ceros y lugares vacíos para comprender su importancia en la notación posicional.
-
-Características principales
--------------------------
+Características
+---------------
 
 - Interfaz táctil con botones +/− y feedback visual (pulso y resalte de columna).
-- Animaciones de "caída" de monedas y tonos cortos usando WebAudio para añadir refuerzo sensorial.
-- Diseño responsivo pensado para tabletas y móviles; ajustes específicos para evitar solapamientos en pantallas pequeñas.
+- Animaciones de "caída" de monedas y efectos sonoros usando WebAudio.
+- Diseño responsivo para tabletas y móviles; evita solapamientos en pantallas pequeñas.
 - Ejemplos rápidos y botón de limpiar para iniciar prácticas.
+- Visualización de descomposición numérica y notación con potencias de 10.
 
-Cómo contribuir y publicar
--------------------------
+Licencia
+-------
 
-Edita los archivos en `docs/` (o en la raíz si prefieres publicar desde `main / root`), luego haz:
+Este proyecto se distribuye bajo la Licencia MIT. El texto completo de la licencia está incluido en el archivo `LICENSE`.
 
-```bash
-cd /Users/pduran/numero-constructor
-git add .
-git commit -m "Update README and mobile layout fixes"
-git push
-```
+Política de contribución
+-----------------------
 
-Después, en GitHub -> Settings -> Pages selecciona la rama `main` y la carpeta `docs` (o `root` si moviste los archivos). Espera unos minutos para que el sitio se publique.
+Gracias por interesarte en contribuir. Para colaborar sigue estos pasos básicos:
 
-Licencia y notas
------------------
-Este proyecto es de uso personal/educativo. Si quieres, añado un archivo `LICENSE` y una política de contribución.
+1. Abre un issue describiendo el cambio o bug que propones.
+2. Haz fork del repositorio y crea una rama descriptiva (`feature/descripcion` o `fix/descripcion`).
+3. Asegúrate de seguir el estilo existente de HTML/CSS/JS y de probar cambios en dispositivos móviles si aplicable.
+4. Envía un pull request con una descripción clara de los cambios y las instrucciones para probarlos.
+5. Mantén los commits pequeños y con mensajes descriptivos.
+
+Al enviar contribuciones aceptas que tu aporte será distribuido bajo la Licencia MIT del proyecto.
+
+Si quieres pautas más detalladas (formato de commits, pruebas automatizadas, o revisión de accesibilidad), abre un issue y lo agregamos a `CONTRIBUTING.md`.

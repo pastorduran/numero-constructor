@@ -61,16 +61,23 @@ function renderColumns() {
 
     const totalStr = total.toString().padStart(7, '0');
 
+    // Limit rendered coins to avoid DOM/visual overflow. Show +N when there are more.
+    const MAX_VISIBLE_COINS = 7;
     denominations.forEach((denom, idx) => {
         const count = state[denom.value];
         let coinsHtml = '';
-        for (let i = 0; i < count; i++) {
+        const visible = Math.min(count, MAX_VISIBLE_COINS);
+        for (let i = 0; i < visible; i++) {
             coinsHtml += `<div class="coin ${denom.color}"></div>`;
         }
 
+        // If there are more coins than visible, add a small badge showing the remaining
+        const overflow = count - visible;
+        const overflowHtml = overflow > 0 ? `<div class="coin-overflow">+${overflow}</div>` : '';
+
         const html = `
             <div class="column">
-                <div class="stack">${coinsHtml}</div>
+                <div class="stack">${coinsHtml}${overflowHtml}</div>
                 <div class="column-count">${count}</div>
                 <div class="column-label">${denom.name}</div>
             </div>
