@@ -9,10 +9,41 @@
 <body>
     <div class="container">
         <header>
-            <h1>🏦 Constructor de Números</h1>
-            <p class="subtitle">Aprende a componer números usando dinero</p>
+            <h1>🔢 Explorador de Números</h1>
+            <p class="subtitle">Domina la composición y notación científica</p>
         </header>
 
+        <!-- MENÚ PRINCIPAL -->
+        <div id="mainMenu" class="main-menu active">
+            <div class="menu-grid">
+                <button class="menu-card" onclick="enterMode('compositionFree')">
+                    <div class="menu-icon">🏗️</div>
+                    <div class="menu-title">Constructor Libre</div>
+                    <div class="menu-description">Explora libremente</div>
+                </button>
+
+                <button class="menu-card" onclick="enterMode('compositionGame')">
+                    <div class="menu-icon">🎮</div>
+                    <div class="menu-title">Desafío Composición</div>
+                    <div class="menu-description">10 preguntas</div>
+                </button>
+
+                <button class="menu-card" onclick="enterMode('notationFree')">
+                    <div class="menu-icon">🧮</div>
+                    <div class="menu-title">Notación Científica</div>
+                    <div class="menu-description">Explora libremente</div>
+                </button>
+
+                <button class="menu-card" onclick="enterMode('notationGame')">
+                    <div class="menu-icon">🔬</div>
+                    <div class="menu-title">Desafío Notación</div>
+                    <div class="menu-description">10 preguntas</div>
+                </button>
+            </div>
+        </div>
+
+        <!-- MODO COMPOSICIÓN: Construir Libremente -->
+        <div id="modoFree" class="mode-content">
         <!-- Selector de dinero -->
         <div class="section">
             <div class="section-title">📝 Elige cuántos billetes/monedas tienes</div>
@@ -60,6 +91,191 @@
                 <button class="example-btn clear-btn" onclick="resetAll()">
                     Limpiar todo
                 </button>
+            </div>
+        </div>
+        <div class="back-menu-btn-wrapper">
+            <button class="back-btn" onclick="backToMenu()">← Volver al menú</button>
+        </div>
+        </div>
+
+        <!-- MODO COMPOSICIÓN: Juego de Desafío -->
+        <div id="compositionGameMode" class="mode-content">
+            <!-- Pantalla de inicio del juego -->
+            <div id="gameStart" class="game-panel">
+                <div class="game-title">🎮 ¡Desafío de Números!</div>
+                <p class="game-subtitle">Demuestra que sabes componer números correctamente</p>
+                <div class="game-info">
+                    <p>📋 <strong>10 preguntas</strong></p>
+                    <p>🎯 Se presentará un número random</p>
+                    <p>💰 Debes seleccionar la cantidad correcta de billetes/monedas</p>
+                    <p>⚠️ Hay preguntas especiales sobre <strong>ceros</strong> (posiciones vacías)</p>
+                </div>
+                <button class="game-start-btn" onclick="startGame()">¡Empezar el desafío!</button>
+            </div>
+
+            <!-- Pantalla de juego -->
+            <div id="gamePlay" class="game-panel" style="display:none;">
+                <div class="game-header">
+                    <div class="game-progress">Pregunta <span id="questionNum">1</span> de 10</div>
+                    <div class="game-score">Puntuación: <span id="gameScoreDisplay">0</span>/10</div>
+                </div>
+
+                <div class="game-question-box">
+                    <div class="game-prompt">Compón este número:</div>
+                    <div class="game-number" id="gameNumber">0</div>
+                    <div id="gameHint" class="game-hint" style="display:none;"></div>
+                </div>
+
+                <div class="game-money-grid" id="gameMoney"></div>
+
+                <div class="game-actions">
+                    <button class="game-btn cancel-btn" onclick="cancelGame()">Cancelar juego</button>
+                    <button class="game-btn submit-btn" id="submitBtn" onclick="checkAnswer()">Verificar respuesta</button>
+                </div>
+            </div>
+
+            <!-- Pantalla de resultado final -->
+            <div id="gameEnd" class="game-panel" style="display:none;">
+                <div class="game-title">¡Juego Finalizado!</div>
+                <div class="final-score">
+                    <div class="score-big" id="finalScore">0</div>
+                    <div class="score-text">de 10 preguntas correctas</div>
+                </div>
+                <div id="finalMessage" class="final-message"></div>
+                <div class="game-actions">
+                    <button class="game-btn" onclick="backToMenu()">← Volver al menú</button>
+                    <button class="game-btn" onclick="startGame()">Jugar de nuevo</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODO NOTACIÓN: Exploración Libre -->
+        <div id="notationFreeMode" class="mode-content">
+            <div class="section">
+                <div class="section-title">🧮 Notación Científica Libre</div>
+                
+                <div class="notation-input-section">
+                    <div class="input-group">
+                        <label for="numberInput">Ingresa un número:</label>
+                        <input type="text" id="numberInput" placeholder="ej: 470000000 o 0.0000000065" class="notation-input">
+                        <button class="btn-primary" onclick="processNotationNumber()">Convertir</button>
+                    </div>
+                    <div class="input-divider">O</div>
+                    <button class="btn-secondary" onclick="randomNotationNumber()">📊 Número Aleatorio</button>
+                </div>
+
+                <div id="notationResult" class="notation-result" style="display:none;">
+                    <div class="notation-step">
+                        <div class="step-label">📍 Paso 1: Número original</div>
+                        <div class="step-value" id="notationStep1"></div>
+                    </div>
+
+                    <div class="notation-step">
+                        <div class="step-label">📍 Paso 2: Mover la coma</div>
+                        <div class="step-value" id="notationStep2"></div>
+                        <div class="step-info" id="notationSpaces"></div>
+                    </div>
+
+                    <div class="notation-step result-box">
+                        <div class="step-label">✨ Resultado: Notación Científica</div>
+                        <div class="notation-formula" id="notationFormula"></div>
+                    </div>
+                </div>
+
+                <div id="notationExamples" class="notation-examples">
+                    <div class="section-title">⚡ Ejemplos rápidos</div>
+                    <div class="examples-flex">
+                        <button class="notation-example-btn" onclick="loadNotationExample(470000000)">
+                            470,000,000<br><span class="small-text">= 4.7 × 10⁸</span>
+                        </button>
+                        <button class="notation-example-btn" onclick="loadNotationExample(0.0000000065)">
+                            0.0000000065<br><span class="small-text">= 6.5 × 10⁻⁹</span>
+                        </button>
+                        <button class="notation-example-btn" onclick="loadNotationExample(5980000000000000000000000)">
+                            Masa Tierra<br><span class="small-text">= 5.98 × 10²⁴ kg</span>
+                        </button>
+                        <button class="notation-example-btn" onclick="loadNotationExample(0.00008)">
+                            Altura pulga<br><span class="small-text">= 8 × 10⁻⁵ m</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="back-menu-btn-wrapper">
+                <button class="back-btn" onclick="backToMenu()">← Volver al menú</button>
+            </div>
+        </div>
+
+        <!-- MODO NOTACIÓN: Desafío -->
+        <div id="notationGameMode" class="mode-content">
+            <!-- Pantalla de inicio del desafío de notación -->
+            <div id="notationGameStart" class="game-panel">
+                <div class="game-title">🔬 ¡Desafío Notación Científica!</div>
+                <p class="game-subtitle">Convierte números a notación científica o al revés</p>
+                <div class="game-info">
+                    <p>📋 <strong>10 preguntas</strong></p>
+                    <p>🔢 Números grandes y pequeños</p>
+                    <p>🔄 Dos tipos: convertir número O escribir resultado</p>
+                    <p>⚡ Demuestra lo que aprendiste</p>
+                </div>
+                <button class="game-start-btn" onclick="startNotationGame()">¡Empezar el desafío!</button>
+            </div>
+
+            <!-- Pantalla de juego de notación -->
+            <div id="notationGamePlay" class="game-panel" style="display:none;">
+                <div class="game-header">
+                    <div class="game-progress">Pregunta <span id="notationQuestionNum">1</span> de 10</div>
+                    <div class="game-score">Puntuación: <span id="notationScoreDisplay">0</span>/10</div>
+                </div>
+
+                <div class="game-question-box">
+                    <div class="game-prompt" id="notationPrompt"></div>
+                    <div class="game-number" id="notationNumber">0</div>
+                </div>
+
+                <div id="notationInputArea" class="notation-input-area"></div>
+
+                <div class="game-actions">
+                    <button class="game-btn cancel-btn" onclick="cancelNotationGame()">Cancelar juego</button>
+                    <button class="game-btn submit-btn" id="notationSubmitBtn" onclick="checkNotationAnswer()">Verificar respuesta</button>
+                </div>
+            </div>
+
+            <!-- Pantalla de resultado final de notación -->
+            <div id="notationGameEnd" class="game-panel" style="display:none;">
+                <div class="game-title">¡Juego Finalizado!</div>
+                <div class="final-score">
+                    <div class="score-big" id="notationFinalScore">0</div>
+                    <div class="score-text">de 10 preguntas correctas</div>
+                </div>
+                <div id="notationFinalMessage" class="final-message"></div>
+                <div class="game-actions">
+                    <button class="game-btn" onclick="backToMenu()">← Volver al menú</button>
+                    <button class="game-btn" onclick="startNotationGame()">Jugar de nuevo</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de retroalimentación -->
+        <div id="feedbackModal" class="feedback-modal" style="display:none;">
+            <div class="feedback-content">
+                <div class="feedback-icon" id="feedbackIcon"></div>
+                <div class="feedback-title" id="feedbackTitle"></div>
+                <div class="feedback-message" id="feedbackMessage"></div>
+                <div id="feedbackExpression" class="feedback-expression" style="display:none;"></div>
+                <button class="feedback-btn" onclick="closeFeedback()">Continuar</button>
+            </div>
+        </div>
+
+        <!-- Modal de confirmación -->
+        <div id="confirmModal" class="feedback-modal" style="display:none;">
+            <div class="feedback-content">
+                <div class="feedback-title" id="confirmTitle">¿Estás seguro?</div>
+                <div class="feedback-message" id="confirmMessage">¿Quieres abandonar el desafío?</div>
+                <div class="confirm-actions">
+                    <button class="confirm-btn cancel" onclick="closeConfirm()">Continuar jugando</button>
+                    <button class="confirm-btn accept" onclick="confirmCancel()">Volver al menú</button>
+                </div>
             </div>
         </div>
     </div>
