@@ -192,7 +192,7 @@ button.add-btn:hover { opacity: 0.98; transform: translateY(-1px); }
 
 .columns-section { display:none; }
 .columns-section.active { display:block; }
-.columns-grid { display:grid; grid-template-columns: repeat(7,1fr); gap:12px; margin-bottom:1.5rem; }
+.columns-grid { display:grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap:10px; margin-bottom:1.5rem; }
 .column { display:flex; flex-direction:column; align-items:center; }
 .stack { width:100%; height:var(--stack-height); max-height:var(--stack-height); min-height:var(--stack-height); border:2px solid #e9ecef; border-radius:10px; display:flex; flex-direction:column-reverse; padding:8px; gap:3px; background: linear-gradient(135deg, #fafafa 0%, #f0f0f0 100%); margin-bottom:8px; overflow-y:auto; position:relative; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); }
 .stack::-webkit-scrollbar { width:8px; }
@@ -263,6 +263,7 @@ button.control-btn[disabled] { opacity:0.55; transform:none; pointer-events:none
 .clear-btn:hover { background:#c0392b; }
 
 /* Color coding for different denominations */
+.color-teal { background: #159a9c; }
 .color-green { background: #5DCAA5; }
 .color-blue { background: #378ADD; }
 .color-coral { background: #D85A30; }
@@ -279,7 +280,9 @@ button.control-btn[disabled] { opacity:0.55; transform:none; pointer-events:none
 .expression-form:last-child { margin-bottom: 0; }
 .form-label { font-size: 13px; font-weight: 700; color: #667eea; margin-bottom: 0.5rem; display: block; }
 .expression-term { display:inline; padding:4px 6px; border-radius:6px; margin:0 2px; font-weight: 600; }
+.term-teal { background: rgba(21,154,156,0.18); color:#0b6769; }
 .term-green { background: rgba(93,202,165,0.2); color:#0d8659; }
+    .columns-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap:4px; margin-bottom:12px; }
 .term-blue { background: rgba(55,138,221,0.2); color:#003d99; }
 .term-coral { background: rgba(216,90,48,0.2); color:#993c1d; }
 .term-purple { background: rgba(127,119,221,0.2); color:#3c3489; }
@@ -679,7 +682,7 @@ button.control-btn[disabled] { opacity:0.55; transform:none; pointer-events:none
 
 .game-money-grid {
     display: grid;
-    grid-template-columns: repeat(7, 1fr);
+    grid-template-columns: repeat(8, minmax(0, 1fr));
     gap: 8px;
     margin-bottom: 1.5rem;
     min-width: 0;
@@ -756,12 +759,12 @@ button.control-btn[disabled] { opacity:0.55; transform:none; pointer-events:none
     }
 
     .game-money-grid {
-        grid-template-columns: repeat(7, minmax(0, 1fr));
-        gap: 5px;
+        grid-template-columns: repeat(8, minmax(0, 1fr));
+        gap: 4px;
     }
 
     .game-money-item {
-        padding: 6px 3px;
+        padding: 6px 2px;
         gap: 4px;
         border: 1px solid #edf0f2;
     }

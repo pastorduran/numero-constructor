@@ -2,6 +2,7 @@
 const STORAGE_KEY = 'numeroConstructorProgress';
 
 const denominations = [
+    { value: 10000000, name: 'DiezMillones', color: 'color-teal' },
     { value: 1000000, name: 'Millones', color: 'color-green' },
     { value: 100000, name: 'CienMiles', color: 'color-blue' },
     { value: 10000, name: 'DiezMiles', color: 'color-coral' },
@@ -46,6 +47,7 @@ function saveProgressSnapshot(key, state) {
 }
 
 let state = {
+    10000000: 0,
     1000000: 0,
     100000: 0,
     10000: 0,
@@ -95,7 +97,7 @@ function renderColumns() {
     columnsSection.classList.add('active');
     columnsGrid.innerHTML = '';
 
-    const totalStr = total.toString().padStart(7, '0');
+    const totalStr = total.toString().padStart(8, '0');
 
     // Limit rendered coins to avoid DOM/visual overflow. Show +N when there are more.
     const MAX_VISIBLE_COINS = 7;
@@ -155,6 +157,7 @@ function renderExpression() {
     expressionSection.classList.add('active');
 
     const termColorMap = {
+        10000000: 'term-teal',
         1000000: 'term-green',
         100000: 'term-blue',
         10000: 'term-coral',
@@ -165,6 +168,7 @@ function renderExpression() {
     };
 
     const exponentsMap = {
+        10000000: 7,
         1000000: 6,
         100000: 5,
         10000: 4,
@@ -269,7 +273,7 @@ function playClickSound(type = 'add') {
 function loadExample(example) { state = { ...example }; render(); }
 
 function resetAll() {
-    state = { 1000000:0,100000:0,10000:0,1000:0,100:0,10:0,1:0 };
+    state = { 10000000:0,1000000:0,100000:0,10000:0,1000:0,100:0,10:0,1:0 };
     render();
 }
 
@@ -448,15 +452,16 @@ function generateNumberWithZeros() {
 
 // Convertir número a respuesta esperada (descomposición)
 function numberToAnswer(num) {
-    const numStr = num.toString().padStart(7, '0');
+    const numStr = num.toString().padStart(8, '0');
     return {
-        1000000: parseInt(numStr[0]),
-        100000: parseInt(numStr[1]),
-        10000: parseInt(numStr[2]),
-        1000: parseInt(numStr[3]),
-        100: parseInt(numStr[4]),
-        10: parseInt(numStr[5]),
-        1: parseInt(numStr[6])
+        10000000: parseInt(numStr[0]),
+        1000000: parseInt(numStr[1]),
+        100000: parseInt(numStr[2]),
+        10000: parseInt(numStr[3]),
+        1000: parseInt(numStr[4]),
+        100: parseInt(numStr[5]),
+        10: parseInt(numStr[6]),
+        1: parseInt(numStr[7])
     };
 }
 
@@ -465,6 +470,7 @@ function generateExpression(num) {
     const answer = numberToAnswer(num);
     
     const termColorMap = {
+        10000000: 'term-teal',
         1000000: 'term-green',
         100000: 'term-blue',
         10000: 'term-coral',
@@ -475,6 +481,7 @@ function generateExpression(num) {
     };
 
     const exponentsMap = {
+        10000000: 7,
         1000000: 6,
         100000: 5,
         10000: 4,
@@ -533,6 +540,7 @@ function startGame() {
 
     // Limpiar estado de juego
     gameState.gameState = {
+        10000000: 0,
         1000000: 0,
         100000: 0,
         10000: 0,
@@ -560,6 +568,7 @@ function loadQuestion() {
 
     // Limpiar respuesta anterior
     gameState.gameState = {
+        10000000: 0,
         1000000: 0,
         100000: 0,
         10000: 0,
@@ -609,7 +618,7 @@ function renderGameMoney() {
 }
 
 function shouldWrapDigitSelector(value) {
-    return [1000000, 100000, 10000, 1000, 100, 10, 1].includes(value);
+    return [10000000, 1000000, 100000, 10000, 1000, 100, 10, 1].includes(value);
 }
 
 // Cambiar dinero en el juego
