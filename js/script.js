@@ -771,7 +771,7 @@ const notationThemeBank = [
     {
         type: 'toScientific',
         prompt: 'Convierte a notación científica:',
-        displayValue: '12 500 metros en un entrenamiento de Blue Lock',
+        displayValue: '12 500 metros que corrió un equipo de fútbol en Madrid',
         number: 12500
     },
     {
@@ -783,67 +783,93 @@ const notationThemeBank = [
     {
         type: 'toScientific',
         prompt: 'Convierte a notación científica:',
-        displayValue: '15 600 metros recorridos en Kyoto',
+        displayValue: '15 600 metros del recorrido de una carrera en Kyoto',
         number: 15600
     },
     {
         type: 'toScientific',
         prompt: 'Convierte a notación científica:',
-        displayValue: '2 500 000 copias vendidas en Tokyo',
+        displayValue: '2 500 000 copias vendidas de un manga en Tokyo',
         number: 2500000
     },
     {
         type: 'toScientific',
         prompt: 'Convierte a notación científica:',
-        displayValue: '45 000 asientos en un estadio de Madrid',
+        displayValue: '45 000 asientos del estadio donde jugaron en Madrid',
         number: 45000
     },
     {
         type: 'toScientific',
         prompt: 'Convierte a notación científica:',
-        displayValue: '1 650 000 habitantes en Barcelona',
+        displayValue: '1 650 000 habitantes de la ciudad de Barcelona',
         number: 1650000
+    },
+    {
+        type: 'toScientific',
+        prompt: 'Convierte a notación científica:',
+        displayValue: '8 400 metros del sendero de una caminata en Nagano',
+        number: 8400
+    },
+    {
+        type: 'toScientific',
+        prompt: 'Convierte a notación científica:',
+        displayValue: '7 800 metros que recorrieron en una misión por la ciudad',
+        number: 7800
     },
     {
         type: 'toNumber',
         prompt: 'Convierte a número decimal:',
-        displayValue: '2,5 × 10^6 personas en una ciudad de Tokyo',
+        displayValue: '2,5 × 10^6 personas de una ciudad grande en Tokyo',
         coefficient: 2.5,
         exponent: 6
     },
     {
         type: 'toNumber',
         prompt: 'Convierte a número decimal:',
-        displayValue: '4,8 × 10^4 metros de un recorrido en Kyoto',
+        displayValue: '4,8 × 10^4 metros del entrenamiento en Kyoto',
         coefficient: 4.8,
         exponent: 4
     },
     {
         type: 'toNumber',
         prompt: 'Convierte a número decimal:',
-        displayValue: '3,2 × 10^3 km de un viaje en Osaka',
+        displayValue: '3,2 × 10^3 km del viaje en Osaka',
         coefficient: 3.2,
         exponent: 3
     },
     {
         type: 'toNumber',
         prompt: 'Convierte a número decimal:',
-        displayValue: '6,7 × 10^5 visitas en Jujutsu Kaisen',
+        displayValue: '6,7 × 10^5 visitas en un torneo de anime durante la semana',
         coefficient: 6.7,
         exponent: 5
     },
     {
         type: 'toNumber',
         prompt: 'Convierte a número decimal:',
-        displayValue: '9,4 × 10^2 metros en una misión de Spy x Family',
+        displayValue: '9,4 × 10^2 metros del trayecto de una misión secreta',
         coefficient: 9.4,
         exponent: 2
     },
     {
+        type: 'toNumber',
+        prompt: 'Convierte a número decimal:',
+        displayValue: '1,2 × 10^7 pasos de una aventura nocturna por la ciudad',
+        coefficient: 1.2,
+        exponent: 7
+    },
+    {
         type: 'toScientific',
         prompt: 'Convierte a notación científica:',
-        displayValue: '8 400 metros de una carrera escolar en Nagano',
-        number: 8400
+        displayValue: '420 000 flores del jardín del parque de Kyoto',
+        number: 420000
+    },
+    {
+        type: 'toNumber',
+        prompt: 'Convierte a número decimal:',
+        displayValue: '5,6 × 10^5 seguidores de un canal de videos populares',
+        coefficient: 5.6,
+        exponent: 5
     }
 ];
 
