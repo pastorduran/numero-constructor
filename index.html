@@ -116,8 +116,20 @@
             <!-- Pantalla de juego -->
             <div id="gamePlay" class="game-panel" style="display:none;">
                 <div class="game-header">
-                    <div class="game-progress">Pregunta <span id="questionNum">1</span> de 10</div>
-                    <div class="game-score">Puntuación: <span id="gameScoreDisplay">0</span>/10</div>
+                    <div class="game-progress-panel">
+                        <div class="game-progress">Pregunta <span id="questionNum">1</span> de 10</div>
+                        <div class="progress-track" aria-label="Progreso del reto">
+                            <div id="gameProgressFill" class="progress-fill"></div>
+                        </div>
+                    </div>
+                    <div class="game-score-panel">
+                        <div class="game-score">Puntuación: <span id="gameScoreDisplay">0</span>/10</div>
+                        <div class="game-stats">
+                            <span id="gameComboBadge" class="stat-pill">Combo x1</span>
+                            <span id="gameStreakBadge" class="stat-pill">Racha 0</span>
+                            <span id="gameLevelBadge" class="stat-pill level-pill">Nivel 1</span>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="game-question-box">
@@ -224,8 +236,20 @@
             <!-- Pantalla de juego de notación -->
             <div id="notationGamePlay" class="game-panel" style="display:none;">
                 <div class="game-header">
-                    <div class="game-progress">Pregunta <span id="notationQuestionNum">1</span> de 10</div>
-                    <div class="game-score">Puntuación: <span id="notationScoreDisplay">0</span>/10</div>
+                    <div class="game-progress-panel">
+                        <div class="game-progress">Pregunta <span id="notationQuestionNum">1</span> de 10</div>
+                        <div class="progress-track" aria-label="Progreso del reto de notación">
+                            <div id="notationProgressFill" class="progress-fill"></div>
+                        </div>
+                    </div>
+                    <div class="game-score-panel">
+                        <div class="game-score">Puntuación: <span id="notationScoreDisplay">0</span>/10</div>
+                        <div class="game-stats">
+                            <span id="notationComboBadge" class="stat-pill">Combo x1</span>
+                            <span id="notationStreakBadge" class="stat-pill">Racha 0</span>
+                            <span id="notationLevelBadge" class="stat-pill level-pill">Nivel 1</span>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="game-question-box">
@@ -266,6 +290,8 @@
                 <button class="feedback-btn" onclick="closeFeedback()">Continuar</button>
             </div>
         </div>
+
+        <div id="confettiLayer" class="confetti-layer" aria-hidden="true"></div>
 
         <!-- Modal de confirmación -->
         <div id="confirmModal" class="feedback-modal" style="display:none;">

@@ -496,21 +496,111 @@ button.control-btn[disabled] { opacity:0.55; transform:none; pointer-events:none
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 1rem;
     margin-bottom: 2rem;
     padding-bottom: 1rem;
     border-bottom: 2px solid #e9ecef;
+}
+
+.game-progress-panel {
+    flex: 1;
+    min-width: 0;
 }
 
 .game-progress {
     font-size: 16px;
     font-weight: 600;
     color: #667eea;
+    margin-bottom: 0.6rem;
+}
+
+.progress-track {
+    width: 100%;
+    height: 12px;
+    background: #edf2ff;
+    border-radius: 999px;
+    overflow: hidden;
+    box-shadow: inset 0 0 0 1px rgba(102, 126, 234, 0.12);
+}
+
+.progress-fill {
+    width: 0%;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #667eea 0%, #4ecdc4 100%);
+    transition: width 0.35s ease;
+}
+
+.game-score-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
 }
 
 .game-score {
     font-size: 16px;
     font-weight: 600;
     color: #2c3e50;
+}
+
+.game-stats {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.45rem;
+}
+
+.stat-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.4rem 0.7rem;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    background: #eef3ff;
+    color: #4c5fd8;
+    border: 1px solid rgba(76, 95, 216, 0.18);
+}
+
+.level-pill {
+    background: linear-gradient(135deg, #fff4cc 0%, #ffe29a 100%);
+    color: #9c6400;
+    border-color: rgba(156, 100, 0, 0.2);
+}
+
+.confetti-layer {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 1100;
+}
+
+.confetti-piece {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 10px;
+    height: 16px;
+    border-radius: 4px;
+    opacity: 0.9;
+    animation: confetti-burst 1.2s ease-out forwards;
+}
+
+@keyframes confetti-burst {
+    0% {
+        transform: translate(-50%, -50%) scale(0.5) rotate(0deg);
+        opacity: 0;
+    }
+    12% {
+        opacity: 1;
+    }
+    100% {
+        transform: translate(var(--x), var(--y)) scale(1) rotate(var(--r));
+        opacity: 0;
+    }
 }
 
 .game-question-box {

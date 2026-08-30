@@ -248,8 +248,86 @@ let gameState = {
     isZeroQuestion: false,
     currentNumber: 0,
     targetAnswers: {},
-    questions: []
+    questions: [],
+    currentStreak: 0,
+    bestStreak: 0,
+    combo: 1,
+    level: 1,
+    specialLevelUnlocked: false
 };
+
+function triggerConfetti() {
+    const container = document.getElementById('confettiLayer');
+    if (!container) return;
+
+    const colors = ['#ff6b6b', '#ffd166', '#06d6a0', '#4ecdc4', '#5b8def', '#9b5de5', '#f15bb5'];
+    const confettiCount = 32;
+
+    container.innerHTML = '';
+
+    for (let i = 0; i < confettiCount; i++) {
+        const piece = document.createElement('span');
+        piece.className = 'confetti-piece';
+        const angle = (Math.PI * 2 * i) / confettiCount;
+        const radius = 60 + Math.random() * 120;
+        const x = Math.cos(angle) * radius;
+        const y = Math.sin(angle) * radius;
+        const r = (Math.random() * 360) - 180;
+
+        piece.style.background = colors[i % colors.length];
+        piece.style.setProperty('--x', `${x}px`);
+        piece.style.setProperty('--y', `${y}px`);
+        piece.style.setProperty('--r', `${r}deg`);
+
+        container.appendChild(piece);
+    }
+
+    setTimeout(() => {
+        container.innerHTML = '';
+    }, 1200);
+}
+
+function updateChallengeHud(state, key = 'game') {
+    const totalQuestions = state.questions.length || 10;
+    const progressPercent = (state.currentQuestion / totalQuestions) * 100;
+    const progressFill = document.getElementById(`${key}ProgressFill`);
+    const comboBadge = document.getElementById(`${key}ComboBadge`);
+    const streakBadge = document.getElementById(`${key}StreakBadge`);
+    const levelBadge = document.getElementById(`${key}LevelBadge`);
+
+    if (progressFill) {
+        progressFill.style.width = `${Math.min(progressPercent, 100)}%`;
+    }
+
+    if (comboBadge) {
+        comboBadge.textContent = `Combo x${Math.max(1, state.combo)}`;
+    }
+
+    if (streakBadge) {
+        streakBadge.textContent = `Racha ${state.currentStreak}`;
+    }
+
+    if (levelBadge) {
+        levelBadge.textContent = state.specialLevelUnlocked ? '⭐ Nivel especial' : `Nivel ${state.level}`;
+    }
+}
+
+function registerAnswerOutcome(state, isCorrect, key = 'game') {
+    if (isCorrect) {
+        state.currentStreak += 1;
+        state.bestStreak = Math.max(state.bestStreak, state.currentStreak);
+        state.combo = Math.max(1, Math.min(5, 1 + Math.floor((state.currentStreak - 1) / 2)));
+        state.level = Math.max(1, Math.floor(state.correctAnswers / 3) + 1);
+        state.specialLevelUnlocked = state.correctAnswers > 0 && state.correctAnswers % 3 === 0;
+    } else {
+        state.currentStreak = 0;
+        state.combo = 1;
+        state.specialLevelUnlocked = false;
+        state.level = 1;
+    }
+
+    updateChallengeHud(state, key);
+}
 
 // Generar números aleatorios con énfasis en ceros
 function generateRandomNumbers() {
@@ -414,6 +492,7 @@ function loadQuestion() {
     document.getElementById('questionNum').textContent = gameState.currentQuestion + 1;
     document.getElementById('gameNumber').textContent = gameState.currentNumber.toLocaleString('es-CL');
     document.getElementById('gameScoreDisplay').textContent = gameState.correctAnswers;
+    updateChallengeHud(gameState, 'game');
 
     // Mostrar pista si es pregunta de ceros
     const hintEl = document.getElementById('gameHint');
@@ -460,9 +539,13 @@ function checkAnswer() {
 
     if (isCorrect) {
         gameState.correctAnswers++;
+        registerAnswerOutcome(gameState, true, 'game');
+        triggerConfetti();
         const expression = generateExpression(gameState.currentNumber);
-        showFeedback('✅', '¡Correcto!', 'Muy bien, lo hiciste perfecto.', expression);
+        const specialMessage = gameState.specialLevelUnlocked ? ' ¡Nivel especial desbloqueado! 🔓' : '';
+        showFeedback('✅', '¡Correcto!', `Muy bien, lo hiciste perfecto.${specialMessage}`, expression);
     } else {
+        registerAnswerOutcome(gameState, false, 'game');
         const expression = generateExpression(gameState.currentNumber);
         showFeedback('❌', 'Incorrecto', 'Aquí está la respuesta correcta:', expression);
     }
@@ -761,10 +844,14 @@ let notationGameState = {
     currentQuestion: 0,
     correctAnswers: 0,
     questions: [],
-    currentQuestion: 0,
     currentType: 'toScientific', // toScientific o toNumber
     currentNumber: 0,
-    currentAnswer: null
+    currentAnswer: null,
+    currentStreak: 0,
+    bestStreak: 0,
+    combo: 1,
+    level: 1,
+    specialLevelUnlocked: false
 };
 
 const notationThemeBank = [
@@ -958,6 +1045,11 @@ function generateNotationQuestions() {
 function startNotationGame() {
     notationGameState.currentQuestion = 0;
     notationGameState.correctAnswers = 0;
+    notationGameState.currentStreak = 0;
+    notationGameState.bestStreak = 0;
+    notationGameState.combo = 1;
+    notationGameState.level = 1;
+    notationGameState.specialLevelUnlocked = false;
     notationGameState.questions = generateNotationQuestions();
     
     document.getElementById('notationGameStart').style.display = 'none';
@@ -979,6 +1071,7 @@ function loadNotationQuestion() {
     
     document.getElementById('notationQuestionNum').textContent = notationGameState.currentQuestion + 1;
     document.getElementById('notationScoreDisplay').textContent = notationGameState.correctAnswers;
+    updateChallengeHud(notationGameState, 'notation');
     
     let inputArea = document.getElementById('notationInputArea');
     inputArea.innerHTML = '';
@@ -1117,7 +1210,10 @@ function checkAllMatchesResolved() {
 
     if (allResolved) {
         notationGameState.correctAnswers++;
-        showNotationFeedback('✅', '¡Perfecto!', 'Relacionaste todos los números correctamente.', true, 'Todas las parejas están bien');
+        registerAnswerOutcome(notationGameState, true, 'notation');
+        triggerConfetti();
+        const specialMessage = notationGameState.specialLevelUnlocked ? ' ¡Nivel especial desbloqueado! 🔓' : '';
+        showNotationFeedback('✅', '¡Perfecto!', `Relacionaste todos los números correctamente.${specialMessage}`, true, 'Todas las parejas están bien');
     }
 }
 
@@ -1155,8 +1251,12 @@ function checkNotationAnswer() {
         
         if (isCorrect) {
             notationGameState.correctAnswers++;
-            showNotationFeedback('✅', '¡Correcto!', `${coeff} × 10^${exp}`, true, feedbackExpression);
+            registerAnswerOutcome(notationGameState, true, 'notation');
+            triggerConfetti();
+            const specialMessage = notationGameState.specialLevelUnlocked ? ' ¡Nivel especial desbloqueado! 🔓' : '';
+            showNotationFeedback('✅', '¡Correcto!', `${coeff} × 10^${exp}${specialMessage}`, true, feedbackExpression);
         } else {
+            registerAnswerOutcome(notationGameState, false, 'notation');
             const hint = exp === expected.exponent ? 'El coeficiente estaba cerca, pero no en el formato correcto.' : 'Observa cuántos lugares mueve la coma: si el número es grande, el exponente aumenta; si es pequeño, el exponente baja.';
             showNotationFeedback('❌', 'Incorrecto', `Tu respuesta fue: ${attemptedAnswer}. ${hint} La respuesta correcta es: ${expected.scientific}`, false, feedbackExpression);
         }
@@ -1182,8 +1282,12 @@ function checkNotationAnswer() {
         
         if (isCorrect) {
             notationGameState.correctAnswers++;
-            showNotationFeedback('✅', '¡Correcto!', `${num.toLocaleString('es-CL', {maximumFractionDigits: 10})}`, true, feedbackExpression);
+            registerAnswerOutcome(notationGameState, true, 'notation');
+            triggerConfetti();
+            const specialMessage = notationGameState.specialLevelUnlocked ? ' ¡Nivel especial desbloqueado! 🔓' : '';
+            showNotationFeedback('✅', '¡Correcto!', `${num.toLocaleString('es-CL', {maximumFractionDigits: 10})}${specialMessage}`, true, feedbackExpression);
         } else {
+            registerAnswerOutcome(notationGameState, false, 'notation');
             const hint = notationGameState.currentNumber >= 1 ? 'Recuerda: el número grande tiene exponente positivo y la coma se mueve hacia la izquierda.' : 'Recuerda: el número pequeño tiene exponente negativo y la coma se mueve hacia la derecha.';
             showNotationFeedback('❌', 'Incorrecto', `Tu respuesta fue: ${attemptedAnswer}. ${hint} La respuesta correcta es: ${notationGameState.currentNumber.toLocaleString('es-CL', {maximumFractionDigits: 10})}`, false, feedbackExpression);
         }
