@@ -605,6 +605,59 @@ function backToMenu() {
 
 // ===== NOTACIÓN CIENTÍFICA =====
 
+function normalizeLocaleNumber(value) {
+    if (value === null || value === undefined) return NaN;
+
+    let raw = String(value).trim().replace(/\s+/g, '');
+    if (!raw) return NaN;
+
+    if (raw.includes(',') && raw.includes('.')) {
+        const lastComma = raw.lastIndexOf(',');
+        const lastDot = raw.lastIndexOf('.');
+        if (lastComma > lastDot) {
+            raw = raw.replace(/\./g, '').replace(',', '.');
+        } else {
+            raw = raw.replace(/,/g, '');
+        }
+    } else if (raw.includes(',')) {
+        const parts = raw.split(',');
+        if (parts.length > 2) {
+            raw = raw.replace(/,/g, '');
+        } else {
+            raw = raw.replace(',', '.');
+        }
+    } else if (raw.includes('.')) {
+        const parts = raw.split('.');
+        if (parts.length > 2) {
+            raw = raw.replace(/\./g, '');
+        }
+    }
+
+    const parsed = Number(raw);
+    return Number.isFinite(parsed) ? parsed : NaN;
+}
+
+function parseExponentInput(value) {
+    if (value === null || value === undefined) return NaN;
+
+    let raw = String(value).trim().toLowerCase().replace(/\s+/g, '');
+    if (!raw) return NaN;
+
+    raw = raw.replace(/×/g, 'x');
+    raw = raw.replace(/\^/g, '^');
+
+    const directMatch = /^[-+]?\d+$/.test(raw);
+    if (directMatch) return Number(raw);
+
+    const scientificMatch = /^x?10\^(?:[-+]?\d+)$/.test(raw);
+    if (scientificMatch) {
+        const exponent = raw.replace(/^x?10\^/, '');
+        return Number(exponent);
+    }
+
+    return NaN;
+}
+
 // Convertir número a notación científica
 function numberToScientific(num) {
     if (num === 0) return { coefficient: 0, exponent: 0, scientific: '0' };
@@ -655,7 +708,7 @@ function processNotationNumber() {
         return;
     }
     
-    const num = parseFloat(input.replace(/,/g, ''));
+    const num = normalizeLocaleNumber(input);
     
     if (isNaN(num)) {
         alert('Por favor ingresa un número válido');
@@ -717,93 +770,162 @@ let notationGameState = {
 const notationThemeBank = [
     {
         type: 'toScientific',
-        prompt: 'En un partido, un jugador corrió',
-        displayValue: '12 500 metros',
+        prompt: 'Convierte a notación científica:',
+        displayValue: '12 500 metros en un entrenamiento de Blue Lock',
         number: 12500
     },
     {
         type: 'toScientific',
-        prompt: 'Un estadio tiene',
-        displayValue: '45 000 asientos',
-        number: 45000
-    },
-    {
-        type: 'toScientific',
-        prompt: 'En una ciudad viven',
-        displayValue: '3 800 000 personas',
+        prompt: 'Convierte a notación científica:',
+        displayValue: '3 800 000 visitantes en una feria de Osaka',
         number: 3800000
     },
     {
         type: 'toScientific',
-        prompt: 'Un manga vendió',
-        displayValue: '2 500 000 copias',
+        prompt: 'Convierte a notación científica:',
+        displayValue: '15 600 metros recorridos en Kyoto',
+        number: 15600
+    },
+    {
+        type: 'toScientific',
+        prompt: 'Convierte a notación científica:',
+        displayValue: '2 500 000 copias vendidas en Tokyo',
         number: 2500000
     },
     {
+        type: 'toScientific',
+        prompt: 'Convierte a notación científica:',
+        displayValue: '45 000 asientos en un estadio de Madrid',
+        number: 45000
+    },
+    {
+        type: 'toScientific',
+        prompt: 'Convierte a notación científica:',
+        displayValue: '1 650 000 habitantes en Barcelona',
+        number: 1650000
+    },
+    {
         type: 'toNumber',
-        prompt: 'Escribe este número en forma decimal:',
-        displayValue: '2,5 × 10^6 copias',
+        prompt: 'Convierte a número decimal:',
+        displayValue: '2,5 × 10^6 personas en una ciudad de Tokyo',
         coefficient: 2.5,
         exponent: 6
     },
     {
         type: 'toNumber',
-        prompt: 'Escribe este número en forma decimal:',
-        displayValue: '4,8 × 10^4 km',
+        prompt: 'Convierte a número decimal:',
+        displayValue: '4,8 × 10^4 metros de un recorrido en Kyoto',
         coefficient: 4.8,
         exponent: 4
     },
     {
-        type: 'toScientific',
-        prompt: 'La distancia de una misión espacial fue',
-        displayValue: '78 000 000 metros',
-        number: 78000000
+        type: 'toNumber',
+        prompt: 'Convierte a número decimal:',
+        displayValue: '3,2 × 10^3 km de un viaje en Osaka',
+        coefficient: 3.2,
+        exponent: 3
+    },
+    {
+        type: 'toNumber',
+        prompt: 'Convierte a número decimal:',
+        displayValue: '6,7 × 10^5 visitas en Jujutsu Kaisen',
+        coefficient: 6.7,
+        exponent: 5
+    },
+    {
+        type: 'toNumber',
+        prompt: 'Convierte a número decimal:',
+        displayValue: '9,4 × 10^2 metros en una misión de Spy x Family',
+        coefficient: 9.4,
+        exponent: 2
     },
     {
         type: 'toScientific',
-        prompt: 'Un videojuego tuvo',
-        displayValue: '1 200 000 visitas',
-        number: 1200000
+        prompt: 'Convierte a notación científica:',
+        displayValue: '8 400 metros de una carrera escolar en Nagano',
+        number: 8400
     }
 ];
 
 // Generar preguntas de notación
-function generateNotationQuestions() {
-    const questions = [];
-    const totalQuestions = 10;
-    const themeCount = Math.floor(totalQuestions * 0.25);
-    const toScientificCount = 5;
+function shuffleArray(items) {
+    const copy = [...items];
+    for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+}
 
-    // 25% de preguntas temáticas para niños
-    for (let i = 0; i < themeCount; i++) {
+function buildMatchingNotationQuestion() {
+    const pairs = shuffleArray([
+        { number: '301.964.898', scientific: '3.02 × 10^8' },
+        { number: '48.000.000', scientific: '4.8 × 10^7' },
+        { number: '0,00000065', scientific: '6.5 × 10^-7' },
+        { number: '7.800.000', scientific: '7.8 × 10^6' },
+        { number: '0,0000042', scientific: '4.2 × 10^-6' },
+        { number: '12.500', scientific: '1.25 × 10^4' }
+    ]).slice(0, 3);
+
+    return {
+        type: 'matchScientific',
+        themed: true,
+        matchData: {
+            pairs: pairs.map((pair, index) => ({
+                id: `match-${index}-${Date.now()}`,
+                number: pair.number,
+                scientific: pair.scientific
+            }))
+        }
+    };
+}
+
+function generateNotationQuestions() {
+    const totalQuestions = 10;
+    const themeIndexes = [1, 5, 8];
+    const questions = Array(totalQuestions).fill(null);
+    const normalQuestions = [];
+
+    // 3 preguntas temáticas distribuidas a lo largo del desafío
+    for (let i = 0; i < themeIndexes.length; i++) {
         const themeQuestion = notationThemeBank[Math.floor(Math.random() * notationThemeBank.length)];
-        questions.push({
+        questions[themeIndexes[i]] = {
             ...themeQuestion,
             themed: true,
             prompt: themeQuestion.prompt,
             displayValue: themeQuestion.displayValue
-        });
+        };
     }
 
-    // 5 preguntas: convertir a notación científica
-    for (let i = 0; i < toScientificCount; i++) {
+    questions[3] = buildMatchingNotationQuestion();
+
+    // 3 preguntas: convertir a notación científica
+    for (let i = 0; i < 3; i++) {
         let num;
         if (Math.random() > 0.5) {
             num = Math.floor(Math.random() * 999000000) + 1000000;
         } else {
             num = Math.random() * 0.00001;
         }
-        questions.push({ type: 'toScientific', number: num, themed: false });
+        normalQuestions.push({ type: 'toScientific', number: num, themed: false });
     }
 
-    // 5 preguntas: convertir de notación científica a número
-    for (let i = 0; i < 5; i++) {
+    // 3 preguntas: convertir de notación científica a número
+    for (let i = 0; i < 3; i++) {
         const coefficient = Math.floor(Math.random() * 90) + 10;
         const exponent = Math.floor(Math.random() * 20) - 10;
-        questions.push({ type: 'toNumber', coefficient, exponent, themed: false });
+        normalQuestions.push({ type: 'toNumber', coefficient, exponent, themed: false });
     }
 
-    return questions.sort(() => Math.random() - 0.5).slice(0, totalQuestions);
+    let normalIndex = 0;
+    for (let i = 0; i < totalQuestions; i++) {
+        if (!questions[i]) {
+            questions[i] = normalQuestions[normalIndex];
+            normalIndex++;
+        }
+    }
+
+    return questions;
 }
 
 // Iniciar juego de notación
@@ -839,7 +961,7 @@ function loadNotationQuestion() {
         notationGameState.currentNumber = question.number;
 
         if (question.themed) {
-            document.getElementById('notationPrompt').textContent = `${question.prompt}:`;
+            document.getElementById('notationPrompt').textContent = question.prompt;
             document.getElementById('notationNumber').textContent = question.displayValue;
         } else {
             document.getElementById('notationPrompt').textContent = 'Convierte este número a notación científica:';
@@ -849,13 +971,100 @@ function loadNotationQuestion() {
         inputArea.innerHTML = `
             <div class="notation-input-row">
                 <label>Coeficiente (a):</label>
-                <input type="text" id="notationCoeff" placeholder="ej: 4.7" maxlength="10">
+                <input type="text" id="notationCoeff" placeholder="Escribe 1 a 9,9 (ej: 3,02)" maxlength="10">
             </div>
             <div class="notation-input-row">
                 <label>Exponente (n):</label>
-                <input type="text" id="notationExp" placeholder="ej: 8 o -5" maxlength="5">
+                <input type="text" id="notationExp" placeholder="Solo escribe el exponente (ej: 8, 5 o -3). No pongas x10^" maxlength="10">
             </div>
         `;
+    } else if (question.type === 'matchScientific') {
+        notationGameState.currentType = 'matchScientific';
+        notationGameState.currentNumber = null;
+        document.getElementById('notationPrompt').textContent = 'Arrastra cada número hasta su notación científica';
+        document.getElementById('notationNumber').textContent = 'Une cada valor con su pareja correcta.';
+
+        const matchData = question.matchData.pairs;
+        const leftItems = shuffleArray(matchData.map(item => ({
+            id: item.id,
+            value: item.number,
+            type: 'number'
+        })));
+        const rightItems = shuffleArray(matchData.map(item => ({
+            id: item.id,
+            value: item.scientific,
+            type: 'scientific'
+        })));
+
+        inputArea.innerHTML = `
+            <div class="notation-match-container">
+                <div class="notation-match-column">
+                    <div class="match-column-title">Números</div>
+                    <div id="notationMatchLeft" class="match-drop-list"></div>
+                </div>
+                <div class="notation-match-column">
+                    <div class="match-column-title">Notación científica</div>
+                    <div id="notationMatchRight" class="match-drop-list"></div>
+                </div>
+            </div>
+        `;
+
+        const leftColumn = document.getElementById('notationMatchLeft');
+        const rightColumn = document.getElementById('notationMatchRight');
+
+        leftItems.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'notation-match-item';
+            card.draggable = true;
+            card.dataset.matchId = item.id;
+            card.textContent = item.value;
+            card.addEventListener('dragstart', (event) => {
+                event.dataTransfer.setData('text/plain', item.id);
+                event.dataTransfer.effectAllowed = 'move';
+            });
+            leftColumn.appendChild(card);
+        });
+
+        rightItems.forEach(item => {
+            const slot = document.createElement('div');
+            slot.className = 'notation-match-slot';
+            slot.dataset.matchId = item.id;
+            slot.innerHTML = `<span class="match-slot-target">${item.value}</span>`;
+            slot.addEventListener('dragover', (event) => {
+                event.preventDefault();
+                if (!slot.classList.contains('match-correct')) {
+                    slot.classList.add('drag-over');
+                }
+            });
+            slot.addEventListener('dragleave', () => slot.classList.remove('drag-over'));
+            slot.addEventListener('drop', (event) => {
+                event.preventDefault();
+                slot.classList.remove('drag-over');
+                const draggedId = event.dataTransfer.getData('text/plain');
+                const correctId = slot.dataset.matchId;
+
+                if (draggedId === correctId) {
+                    slot.classList.add('match-correct');
+                    slot.innerHTML = `<span class="match-slot-correct">${item.value}</span>`;
+                    const sourceCard = leftColumn.querySelector(`[data-match-id="${draggedId}"]`);
+                    if (sourceCard) {
+                        sourceCard.classList.add('matched');
+                        sourceCard.draggable = false;
+                        sourceCard.style.opacity = '0.45';
+                    }
+                    checkAllMatchesResolved();
+                } else {
+                    slot.classList.add('match-error');
+                    const originalText = slot.innerHTML;
+                    slot.innerHTML = '<span class="match-slot-hint">Intenta otra vez</span>';
+                    setTimeout(() => {
+                        slot.classList.remove('match-error');
+                        slot.innerHTML = originalText;
+                    }, 750);
+                }
+            });
+            rightColumn.appendChild(slot);
+        });
     } else {
         notationGameState.currentNumber = scientificToNumber(question.coefficient, question.exponent);
 
@@ -863,16 +1072,26 @@ function loadNotationQuestion() {
             document.getElementById('notationPrompt').textContent = question.prompt;
             document.getElementById('notationNumber').textContent = question.displayValue;
         } else {
-            document.getElementById('notationPrompt').textContent = 'Escribe este número en forma decimal:';
+            document.getElementById('notationPrompt').textContent = 'Convierte a número decimal:';
             document.getElementById('notationNumber').textContent = `${question.coefficient} × 10^${question.exponent}`;
         }
         
         inputArea.innerHTML = `
             <div class="notation-input-row">
                 <label>Número completo:</label>
-                <input type="text" id="notationFull" placeholder="ej: 470000000 o 0.0000000065">
+                <input type="text" id="notationFull" placeholder="Escribe el número completo (ej: 470000000 o 0,0000000065)">
             </div>
         `;
+    }
+}
+
+function checkAllMatchesResolved() {
+    const slots = document.querySelectorAll('.notation-match-slot');
+    const allResolved = Array.from(slots).every(slot => slot.classList.contains('match-correct'));
+
+    if (allResolved) {
+        notationGameState.correctAnswers++;
+        showNotationFeedback('✅', '¡Perfecto!', 'Relacionaste todos los números correctamente.', true, 'Todas las parejas están bien');
     }
 }
 
@@ -882,6 +1101,10 @@ function checkNotationAnswer() {
     let isCorrect = false;
     let feedbackExpression = '';
     
+    if (type === 'matchScientific') {
+        return;
+    }
+
     if (type === 'toScientific') {
         const coeffInput = document.getElementById('notationCoeff').value.trim();
         const expInput = document.getElementById('notationExp').value.trim();
@@ -891,11 +1114,12 @@ function checkNotationAnswer() {
             return;
         }
         
-        const coeff = parseFloat(coeffInput);
-        const exp = parseInt(expInput);
+        const coeff = normalizeLocaleNumber(coeffInput);
+        const exp = parseExponentInput(expInput);
+        const attemptedAnswer = `${coeffInput.replace(/\./g, ',')} × 10^${expInput}`;
         
         if (isNaN(coeff) || isNaN(exp)) {
-            alert('Por favor ingresa valores válidos');
+            alert('Escribe solo el exponente, por ejemplo 8, 5 o -3. Si quieres, también puedes escribir x10^8.');
             return;
         }
         
@@ -907,17 +1131,19 @@ function checkNotationAnswer() {
             notationGameState.correctAnswers++;
             showNotationFeedback('✅', '¡Correcto!', `${coeff} × 10^${exp}`, true, feedbackExpression);
         } else {
-            showNotationFeedback('❌', 'Incorrecto', `La respuesta correcta es: ${expected.scientific}`, false, feedbackExpression);
+            const hint = exp === expected.exponent ? 'El coeficiente estaba cerca, pero no en el formato correcto.' : 'Observa cuántos lugares mueve la coma: si el número es grande, el exponente aumenta; si es pequeño, el exponente baja.';
+            showNotationFeedback('❌', 'Incorrecto', `Tu respuesta fue: ${attemptedAnswer}. ${hint} La respuesta correcta es: ${expected.scientific}`, false, feedbackExpression);
         }
     } else {
-        const fullInput = document.getElementById('notationFull').value.trim().replace(/,/g, '');
+        const fullInput = document.getElementById('notationFull').value.trim();
         
         if (!fullInput) {
             alert('Por favor ingresa el número');
             return;
         }
         
-        const num = parseFloat(fullInput);
+        const num = normalizeLocaleNumber(fullInput);
+        const attemptedAnswer = fullInput;
         
         if (isNaN(num)) {
             alert('Por favor ingresa un número válido');
@@ -932,7 +1158,8 @@ function checkNotationAnswer() {
             notationGameState.correctAnswers++;
             showNotationFeedback('✅', '¡Correcto!', `${num.toLocaleString('es-CL', {maximumFractionDigits: 10})}`, true, feedbackExpression);
         } else {
-            showNotationFeedback('❌', 'Incorrecto', `La respuesta correcta es: ${notationGameState.currentNumber.toLocaleString('es-CL', {maximumFractionDigits: 10})}`, false, feedbackExpression);
+            const hint = notationGameState.currentNumber >= 1 ? 'Recuerda: el número grande tiene exponente positivo y la coma se mueve hacia la izquierda.' : 'Recuerda: el número pequeño tiene exponente negativo y la coma se mueve hacia la derecha.';
+            showNotationFeedback('❌', 'Incorrecto', `Tu respuesta fue: ${attemptedAnswer}. ${hint} La respuesta correcta es: ${notationGameState.currentNumber.toLocaleString('es-CL', {maximumFractionDigits: 10})}`, false, feedbackExpression);
         }
     }
 }
