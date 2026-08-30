@@ -323,7 +323,7 @@ function triggerConfetti() {
     }, 1200);
 }
 
-function showComboBurst(label, key = 'game', delay = 220) {
+function showComboBurst(label, key = 'game', delay = 320) {
     const burst = document.getElementById('comboBurst');
     const badge = document.getElementById(`${key}ComboBadge`);
     if (!burst || !badge) return;
@@ -339,7 +339,7 @@ function showComboBurst(label, key = 'game', delay = 220) {
 
         setTimeout(() => {
             burst.classList.remove('show');
-        }, 900);
+        }, 1200);
     }, delay);
 }
 
@@ -389,15 +389,15 @@ function registerAnswerOutcome(state, isCorrect, key = 'game') {
     saveProgressSnapshot(key, state);
 
     if (isCorrect && state.combo !== previousCombo) {
-        showComboBurst(`¡Poder x${state.combo}!`, key, 240);
+        showComboBurst(`¡Poder x${state.combo}!`, key, 320);
     } else if (isCorrect) {
-        showComboBurst('¡Combo!', key, 240);
+        showComboBurst('¡Combo!', key, 320);
     } else {
-        showComboBurst('Racha 0', key, 240);
+        showComboBurst('Racha 0', key, 320);
     }
 
     if (isCorrect && state.level !== previousLevel) {
-        showComboBurst(`¡Nivel ${state.level} desbloqueado!`, key, 520);
+        showComboBurst(`¡Nivel ${state.level} desbloqueado!`, key, 620);
     }
 }
 
@@ -699,7 +699,7 @@ function endGame() {
         const previousLevel = gameState.level;
         gameState.level = Math.min(3, gameState.level + 1);
         if (gameState.level !== previousLevel) {
-            showComboBurst(`¡Nivel ${gameState.level} desbloqueado!`, 'game', 260);
+            showComboBurst(`¡Nivel ${gameState.level} desbloqueado!`, 'game', 420);
         }
     }
     saveProgressSnapshot('game', gameState);
@@ -1455,7 +1455,7 @@ function endNotationGame() {
         const previousLevel = notationGameState.level;
         notationGameState.level = Math.min(3, notationGameState.level + 1);
         if (notationGameState.level !== previousLevel) {
-            showComboBurst(`¡Nivel ${notationGameState.level} desbloqueado!`, 'notation', 260);
+            showComboBurst(`¡Nivel ${notationGameState.level} desbloqueado!`, 'notation', 420);
         }
     }
     saveProgressSnapshot('notation', notationGameState);

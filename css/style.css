@@ -586,36 +586,37 @@ button.control-btn[disabled] { opacity:0.55; transform:none; pointer-events:none
     transform: translate(-50%, 0) scale(0.8);
     opacity: 0;
     z-index: 1200;
-    padding: 0.55rem 0.9rem;
+    padding: 0.7rem 1.05rem;
     border-radius: 999px;
-    background: linear-gradient(135deg, #ff9f43 0%, #ff5f6d 100%);
+    background: linear-gradient(135deg, #ffb703 0%, #ff7b00 35%, #ff4d6d 100%);
     color: white;
-    font-size: 14px;
-    font-weight: 800;
-    letter-spacing: 0.04em;
-    box-shadow: 0 10px 26px rgba(255, 95, 109, 0.35);
+    font-size: 15px;
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    box-shadow: 0 14px 28px rgba(255, 123, 0, 0.38), 0 0 0 3px rgba(255,255,255,0.25);
     white-space: nowrap;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.18);
 }
 
 .combo-burst.show {
-    animation: combo-pop 0.9s ease-out forwards;
+    animation: combo-pop 1.2s ease-out forwards;
 }
 
 @keyframes combo-pop {
     0% {
         opacity: 0;
-        transform: translate(-50%, 10px) scale(0.7);
+        transform: translate(-50%, 14px) scale(0.72);
     }
     18% {
         opacity: 1;
     }
-    62% {
+    55% {
         opacity: 1;
-        transform: translate(-50%, -12px) scale(1.08);
+        transform: translate(-50%, -18px) scale(1.12);
     }
     100% {
         opacity: 0;
-        transform: translate(-50%, -32px) scale(1.12);
+        transform: translate(-50%, -42px) scale(1.18);
     }
 }
 
@@ -681,6 +682,7 @@ button.control-btn[disabled] { opacity:0.55; transform:none; pointer-events:none
     grid-template-columns: repeat(7, 1fr);
     gap: 8px;
     margin-bottom: 1.5rem;
+    min-width: 0;
 }
 
 .game-money-item {
@@ -691,6 +693,8 @@ button.control-btn[disabled] { opacity:0.55; transform:none; pointer-events:none
     padding: 6px;
     background: #fafafa;
     border-radius: 8px;
+    min-width: 0;
+    width: 100%;
 }
 
 .game-money-label {
@@ -698,6 +702,8 @@ button.control-btn[disabled] { opacity:0.55; transform:none; pointer-events:none
     color: #7f8c8d;
     text-align: center;
     font-weight: 600;
+    width: 100%;
+    line-height: 1.2;
 }
 
 .game-controls {
@@ -706,6 +712,8 @@ button.control-btn[disabled] { opacity:0.55; transform:none; pointer-events:none
     align-items: center;
     justify-content: center;
     gap: 3px;
+    width: 100%;
+    max-width: 100%;
 }
 
 .game-controls button {
@@ -739,6 +747,49 @@ button.control-btn[disabled] { opacity:0.55; transform:none; pointer-events:none
     min-width: 28px;
     text-align: center;
     flex-shrink: 0;
+}
+
+/* Ajuste específico para tablet/iPad en el desafío de composición */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .game-panel {
+        padding: 1.25rem;
+    }
+
+    .game-money-grid {
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 5px;
+    }
+
+    .game-money-item {
+        padding: 6px 3px;
+        gap: 4px;
+        border: 1px solid #edf0f2;
+    }
+
+    .game-money-label {
+        font-size: 8px;
+        line-height: 1.2;
+        min-height: 19px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .game-controls {
+        gap: 2px;
+    }
+
+    .game-controls button {
+        width: 26px;
+        height: 26px;
+        font-size: 11px;
+    }
+
+    .game-display {
+        font-size: 12px;
+        min-width: 18px;
+        line-height: 26px;
+    }
 }
 
 .game-actions {
