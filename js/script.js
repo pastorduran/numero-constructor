@@ -527,9 +527,24 @@ function renderGameMoney() {
     });
 }
 
+function shouldWrapDigitSelector(value) {
+    return [1000000, 100000, 10000, 1000, 100, 10, 1].includes(value);
+}
+
 // Cambiar dinero en el juego
 function gameChangeMoney(value, delta) {
-    gameState.gameState[value] = Math.max(0, gameState.gameState[value] + delta);
+    if (shouldWrapDigitSelector(value)) {
+        const nextValue = gameState.gameState[value] + delta;
+        if (nextValue > 9) {
+            gameState.gameState[value] = 0;
+        } else if (nextValue < 0) {
+            gameState.gameState[value] = 9;
+        } else {
+            gameState.gameState[value] = nextValue;
+        }
+    } else {
+        gameState.gameState[value] = Math.max(0, gameState.gameState[value] + delta);
+    }
     renderGameMoney();
 }
 
