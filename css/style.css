@@ -688,6 +688,36 @@ button.control-btn[disabled] { opacity:0.55; transform:none; pointer-events:none
     min-width: 0;
 }
 
+.composition-options {
+    display: grid;
+    gap: 10px;
+    margin-bottom: 1.5rem;
+}
+
+.composition-option {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    background: #f8fafc;
+    color: #2c3e50;
+    font: 600 15px/1.5 'Courier New', monospace;
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.composition-option:hover {
+    border-color: #667eea;
+    background: #f1f4ff;
+}
+
+.composition-option.selected {
+    border-color: #4c5fd8;
+    background: #e9eeff;
+    box-shadow: 0 0 0 3px rgba(76, 95, 216, 0.12);
+}
+
 .game-money-item {
     display: flex;
     flex-direction: column;

@@ -409,6 +409,7 @@ function registerAnswerOutcome(state, isCorrect, key = 'game') {
 function generateRandomNumbers(level = 1) {
     const questions = [];
     const totalQuestions = 10;
+    const questionTypes = ['selector', 'normal', 'exponential', 'selector', 'normal', 'exponential', 'selector', 'normal', 'exponential', 'selector'];
     const zeroQuestionsCount = 3 + (level >= 2 ? 1 : 0);
     const normalQuestionsCount = totalQuestions - zeroQuestionsCount;
     const maxRange = level >= 3 ? 99999999 : 9999999;
@@ -431,8 +432,9 @@ function generateRandomNumbers(level = 1) {
         questions.push({ number: num, emphasizeZeros: true });
     }
 
-    // Barajar
-    return questions.sort(() => Math.random() - 0.5);
+    return questions
+        .sort(() => Math.random() - 0.5)
+        .map((question, index) => ({ ...question, type: questionTypes[index] }));
 }
 
 // Generar número con ceros estratégicos (como en la guía)
@@ -522,6 +524,39 @@ function generateExpression(num) {
     `;
 }
 
+function formatCompositionExpression(answer, type) {
+    const terms = denominations
+        .filter(denom => answer[denom.value] > 0)
+        .map(denom => type === 'normal'
+            ? `${answer[denom.value]} × ${denom.value.toLocaleString('es-CL')}`
+            : `${answer[denom.value]} × 10<sup>${Math.log10(denom.value)}</sup>`
+        );
+
+    return terms.length ? terms.join(' + ') : '0';
+}
+
+function createCompositionOptions(num, type) {
+    const answer = numberToAnswer(num);
+    const incorrectAnswer = { ...answer };
+    const changedDenomination = [...denominations].reverse().find(denom => answer[denom.value] > 0);
+
+    if (changedDenomination) {
+        incorrectAnswer[changedDenomination.value] = (incorrectAnswer[changedDenomination.value] + 1) % 10;
+    }
+
+    const alternateAnswer = { ...answer };
+    const alternateDenomination = denominations.find(denom => answer[denom.value] > 0);
+    if (alternateDenomination) {
+        alternateAnswer[alternateDenomination.value] = (alternateAnswer[alternateDenomination.value] + 2) % 10;
+    }
+
+    return [
+        { expression: formatCompositionExpression(answer, type), correct: true },
+        { expression: formatCompositionExpression(incorrectAnswer, type), correct: false },
+        { expression: formatCompositionExpression(alternateAnswer, type), correct: false }
+    ].sort(() => Math.random() - 0.5);
+}
+
 // Iniciar el juego
 function startGame() {
     const saved = getSavedProgress();
@@ -531,6 +566,7 @@ function startGame() {
     gameState.currentStreak = 0;
     gameState.combo = 1;
     gameState.specialLevelUnlocked = false;
+    gameState.selectedOption = null;
     gameState.questions = generateRandomNumbers(gameState.level);
 
     // Ocultar pantalla de inicio
@@ -565,6 +601,8 @@ function loadQuestion() {
     gameState.currentNumber = question.number;
     gameState.isZeroQuestion = question.emphasizeZeros;
     gameState.targetAnswers = numberToAnswer(question.number);
+    gameState.selectedOption = null;
+    gameState.questionOptions = question.type === 'selector' ? [] : createCompositionOptions(question.number, question.type);
 
     // Limpiar respuesta anterior
     gameState.gameState = {
@@ -593,7 +631,39 @@ function loadQuestion() {
         hintEl.style.display = 'none';
     }
 
-    renderGameMoney();
+    renderCompositionQuestion(question);
+}
+
+function renderCompositionQuestion(question) {
+    const prompt = document.querySelector('#gamePlay .game-prompt');
+    const moneyGrid = document.getElementById('gameMoney');
+    const options = document.getElementById('compositionOptions');
+    const isSelectorQuestion = question.type === 'selector';
+
+    prompt.textContent = isSelectorQuestion
+        ? 'Compón este número:'
+        : question.type === 'normal'
+            ? 'Elige la descomposición normal correcta:'
+            : 'Elige la descomposición con potencias de 10 correcta:';
+
+    moneyGrid.style.display = isSelectorQuestion ? 'grid' : 'none';
+    options.style.display = isSelectorQuestion ? 'none' : 'grid';
+
+    if (isSelectorQuestion) {
+        renderGameMoney();
+        return;
+    }
+
+    options.innerHTML = gameState.questionOptions.map((option, index) => `
+        <button class="composition-option ${gameState.selectedOption === index ? 'selected' : ''}" onclick="selectCompositionOption(${index})">
+            ${option.expression}
+        </button>
+    `).join('');
+}
+
+function selectCompositionOption(index) {
+    gameState.selectedOption = index;
+    renderCompositionQuestion(gameState.questions[gameState.currentQuestion]);
 }
 
 // Renderizar controles de dinero en el juego
@@ -640,7 +710,10 @@ function gameChangeMoney(value, delta) {
 
 // Verificar respuesta
 function checkAnswer() {
-    const isCorrect = JSON.stringify(gameState.gameState) === JSON.stringify(gameState.targetAnswers);
+    const question = gameState.questions[gameState.currentQuestion];
+    const isCorrect = question.type === 'selector'
+        ? JSON.stringify(gameState.gameState) === JSON.stringify(gameState.targetAnswers)
+        : gameState.questionOptions[gameState.selectedOption]?.correct === true;
 
     if (isCorrect) {
         gameState.correctAnswers++;
