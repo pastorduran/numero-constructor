@@ -578,6 +578,47 @@ button.control-btn[disabled] { opacity:0.55; transform:none; pointer-events:none
     z-index: 1100;
 }
 
+.combo-burst {
+    position: fixed;
+    pointer-events: none;
+    left: 50%;
+    top: 18%;
+    transform: translate(-50%, 0) scale(0.8);
+    opacity: 0;
+    z-index: 1200;
+    padding: 0.55rem 0.9rem;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #ff9f43 0%, #ff5f6d 100%);
+    color: white;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    box-shadow: 0 10px 26px rgba(255, 95, 109, 0.35);
+    white-space: nowrap;
+}
+
+.combo-burst.show {
+    animation: combo-pop 0.9s ease-out forwards;
+}
+
+@keyframes combo-pop {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, 10px) scale(0.7);
+    }
+    18% {
+        opacity: 1;
+    }
+    62% {
+        opacity: 1;
+        transform: translate(-50%, -12px) scale(1.08);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -32px) scale(1.12);
+    }
+}
+
 .confetti-piece {
     position: absolute;
     top: 50%;

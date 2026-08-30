@@ -1,4 +1,6 @@
 // Extracted JS from original file
+const STORAGE_KEY = 'numeroConstructorProgress';
+
 const denominations = [
     { value: 1000000, name: 'Millones', color: 'color-green' },
     { value: 100000, name: 'CienMiles', color: 'color-blue' },
@@ -8,6 +10,40 @@ const denominations = [
     { value: 10, name: 'Decenas', color: 'color-red' },
     { value: 1, name: 'Unidades', color: 'color-lime' }
 ];
+
+function getSavedProgress() {
+    try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+        return {
+            compositionLevel: Math.max(1, Number(saved.compositionLevel) || 1),
+            notationLevel: Math.max(1, Number(saved.notationLevel) || 1),
+            bestComposition: Number(saved.bestComposition) || 0,
+            bestNotation: Number(saved.bestNotation) || 0
+        };
+    } catch (e) {
+        return {
+            compositionLevel: 1,
+            notationLevel: 1,
+            bestComposition: 0,
+            bestNotation: 0
+        };
+    }
+}
+
+function saveProgressSnapshot(key, state) {
+    const saved = getSavedProgress();
+    const next = {
+        ...saved,
+        compositionLevel: key === 'game' ? Math.max(saved.compositionLevel, Math.max(1, state.level || 1)) : saved.compositionLevel,
+        notationLevel: key === 'notation' ? Math.max(saved.notationLevel, Math.max(1, state.level || 1)) : saved.notationLevel,
+        bestComposition: key === 'game' ? Math.max(saved.bestComposition, state.correctAnswers || 0) : saved.bestComposition,
+        bestNotation: key === 'notation' ? Math.max(saved.bestNotation, state.correctAnswers || 0) : saved.bestNotation
+    };
+
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    } catch (e) {}
+}
 
 let state = {
     1000000: 0,
@@ -216,16 +252,16 @@ function playClickSound(type = 'add') {
         const o = ctx.createOscillator();
         const g = ctx.createGain();
         o.type = 'sine';
-        o.frequency.value = type === 'add' ? 880 : 520;
+        o.frequency.value = type === 'add' ? 760 : 420;
         g.gain.value = 0.0001;
         o.connect(g);
         g.connect(ctx.destination);
         const now = ctx.currentTime;
         g.gain.setValueAtTime(0.0001, now);
-        g.gain.exponentialRampToValueAtTime(0.08, now + 0.01);
-        g.gain.exponentialRampToValueAtTime(0.0001, now + 0.16);
+        g.gain.exponentialRampToValueAtTime(0.025, now + 0.01);
+        g.gain.exponentialRampToValueAtTime(0.0001, now + 0.2);
         o.start(now);
-        o.stop(now + 0.18);
+        o.stop(now + 0.22);
         setTimeout(() => { try { ctx.close(); } catch (e) {} }, 500);
     } catch (e) { }
 }
@@ -287,6 +323,26 @@ function triggerConfetti() {
     }, 1200);
 }
 
+function showComboBurst(label, key = 'game', delay = 220) {
+    const burst = document.getElementById('comboBurst');
+    const badge = document.getElementById(`${key}ComboBadge`);
+    if (!burst || !badge) return;
+
+    setTimeout(() => {
+        burst.textContent = label;
+        const rect = badge.getBoundingClientRect();
+        burst.style.left = `${rect.left + rect.width / 2}px`;
+        burst.style.top = `${rect.top - 8}px`;
+        burst.classList.remove('show');
+        void burst.offsetWidth;
+        burst.classList.add('show');
+
+        setTimeout(() => {
+            burst.classList.remove('show');
+        }, 900);
+    }, delay);
+}
+
 function updateChallengeHud(state, key = 'game') {
     const totalQuestions = state.questions.length || 10;
     const progressPercent = (state.currentQuestion / totalQuestions) * 100;
@@ -313,11 +369,14 @@ function updateChallengeHud(state, key = 'game') {
 }
 
 function registerAnswerOutcome(state, isCorrect, key = 'game') {
+    const previousCombo = state.combo;
+    const previousLevel = state.level;
+
     if (isCorrect) {
         state.currentStreak += 1;
         state.bestStreak = Math.max(state.bestStreak, state.currentStreak);
         state.combo = Math.max(1, Math.min(5, 1 + Math.floor((state.currentStreak - 1) / 2)));
-        state.level = Math.max(1, Math.floor(state.correctAnswers / 3) + 1);
+        state.level = Math.min(3, Math.max(1, Math.floor(state.correctAnswers / 3) + 1));
         state.specialLevelUnlocked = state.correctAnswers > 0 && state.correctAnswers % 3 === 0;
     } else {
         state.currentStreak = 0;
@@ -327,20 +386,34 @@ function registerAnswerOutcome(state, isCorrect, key = 'game') {
     }
 
     updateChallengeHud(state, key);
+    saveProgressSnapshot(key, state);
+
+    if (isCorrect && state.combo !== previousCombo) {
+        showComboBurst(`¡Poder x${state.combo}!`, key, 240);
+    } else if (isCorrect) {
+        showComboBurst('¡Combo!', key, 240);
+    } else {
+        showComboBurst('Racha 0', key, 240);
+    }
+
+    if (isCorrect && state.level !== previousLevel) {
+        showComboBurst(`¡Nivel ${state.level} desbloqueado!`, key, 520);
+    }
 }
 
 // Generar números aleatorios con énfasis en ceros
-function generateRandomNumbers() {
+function generateRandomNumbers(level = 1) {
     const questions = [];
     const totalQuestions = 10;
-    const zeroQuestionsCount = 3;
+    const zeroQuestionsCount = 3 + (level >= 2 ? 1 : 0);
     const normalQuestionsCount = totalQuestions - zeroQuestionsCount;
+    const maxRange = level >= 3 ? 99999999 : 9999999;
 
     // Preguntas NORMALES (sin énfasis en ceros)
     for (let i = 0; i < normalQuestionsCount; i++) {
         let num = 0;
-        while (num === 0 || num > 9999999) {
-            num = Math.floor(Math.random() * 10000000);
+        while (num === 0 || num > maxRange) {
+            num = Math.floor(Math.random() * (maxRange + 1));
         }
         questions.push({ number: num, emphasizeZeros: false });
     }
@@ -348,6 +421,9 @@ function generateRandomNumbers() {
     // Preguntas CON ÉNFASIS EN CEROS
     for (let i = 0; i < zeroQuestionsCount; i++) {
         let num = generateNumberWithZeros();
+        if (level >= 2) {
+            num = Math.max(1000, num + Math.floor(Math.random() * 50000));
+        }
         questions.push({ number: num, emphasizeZeros: true });
     }
 
@@ -441,9 +517,14 @@ function generateExpression(num) {
 
 // Iniciar el juego
 function startGame() {
+    const saved = getSavedProgress();
+    gameState.level = saved.compositionLevel || 1;
     gameState.currentQuestion = 0;
     gameState.correctAnswers = 0;
-    gameState.questions = generateRandomNumbers();
+    gameState.currentStreak = 0;
+    gameState.combo = 1;
+    gameState.specialLevelUnlocked = false;
+    gameState.questions = generateRandomNumbers(gameState.level);
 
     // Ocultar pantalla de inicio
     document.getElementById('gameStart').style.display = 'none';
@@ -555,12 +636,14 @@ function checkAnswer() {
     if (isCorrect) {
         gameState.correctAnswers++;
         registerAnswerOutcome(gameState, true, 'game');
+        playClickSound('add');
         triggerConfetti();
         const expression = generateExpression(gameState.currentNumber);
         const specialMessage = gameState.specialLevelUnlocked ? ' ¡Nivel especial desbloqueado! 🔓' : '';
         showFeedback('✅', '¡Correcto!', `Muy bien, lo hiciste perfecto.${specialMessage}`, expression);
     } else {
         registerAnswerOutcome(gameState, false, 'game');
+        playClickSound('sub');
         const expression = generateExpression(gameState.currentNumber);
         showFeedback('❌', 'Incorrecto', 'Aquí está la respuesta correcta:', expression);
     }
@@ -612,6 +695,15 @@ function endGame() {
     document.getElementById('gameEnd').style.display = 'block';
     document.getElementById('finalScore').textContent = gameState.correctAnswers;
 
+    if (gameState.correctAnswers >= 7) {
+        const previousLevel = gameState.level;
+        gameState.level = Math.min(3, gameState.level + 1);
+        if (gameState.level !== previousLevel) {
+            showComboBurst(`¡Nivel ${gameState.level} desbloqueado!`, 'game', 260);
+        }
+    }
+    saveProgressSnapshot('game', gameState);
+
     // Mensaje personalizado
     let message = '';
     if (gameState.correctAnswers === 10) {
@@ -626,7 +718,7 @@ function endGame() {
         message = '💪 ¡Vamos! Inténtalo de nuevo.';
     }
 
-    document.getElementById('finalMessage').textContent = message;
+    document.getElementById('finalMessage').textContent = `${message} Nivel actual: ${gameState.level}`;
 }
 
 // Cambiar de modo
@@ -1008,11 +1100,13 @@ function buildMatchingNotationQuestion() {
     };
 }
 
-function generateNotationQuestions() {
+function generateNotationQuestions(level = 1) {
     const totalQuestions = 10;
     const themeIndexes = [1, 5, 8];
     const questions = Array(totalQuestions).fill(null);
     const normalQuestions = [];
+    const maxCoefficient = level >= 3 ? 99 : 90;
+    const exponentRange = level >= 3 ? 25 : 20;
 
     // 3 preguntas temáticas distribuidas a lo largo del desafío
     for (let i = 0; i < themeIndexes.length; i++) {
@@ -1031,17 +1125,17 @@ function generateNotationQuestions() {
     for (let i = 0; i < 3; i++) {
         let num;
         if (Math.random() > 0.5) {
-            num = Math.floor(Math.random() * 999000000) + 1000000;
+            num = Math.floor(Math.random() * (level >= 3 ? 9999999999 : 999000000)) + (level >= 2 ? 100000 : 1000000);
         } else {
-            num = Math.random() * 0.00001;
+            num = Math.random() * (level >= 3 ? 0.0000001 : 0.00001);
         }
         normalQuestions.push({ type: 'toScientific', number: num, themed: false });
     }
 
     // 3 preguntas: convertir de notación científica a número
     for (let i = 0; i < 3; i++) {
-        const coefficient = Math.floor(Math.random() * 90) + 10;
-        const exponent = Math.floor(Math.random() * 20) - 10;
+        const coefficient = Math.floor(Math.random() * maxCoefficient) + 10;
+        const exponent = Math.floor(Math.random() * exponentRange) - Math.floor(exponentRange / 2);
         normalQuestions.push({ type: 'toNumber', coefficient, exponent, themed: false });
     }
 
@@ -1058,14 +1152,15 @@ function generateNotationQuestions() {
 
 // Iniciar juego de notación
 function startNotationGame() {
+    const saved = getSavedProgress();
     notationGameState.currentQuestion = 0;
     notationGameState.correctAnswers = 0;
     notationGameState.currentStreak = 0;
     notationGameState.bestStreak = 0;
     notationGameState.combo = 1;
-    notationGameState.level = 1;
+    notationGameState.level = saved.notationLevel || 1;
     notationGameState.specialLevelUnlocked = false;
-    notationGameState.questions = generateNotationQuestions();
+    notationGameState.questions = generateNotationQuestions(notationGameState.level);
     
     document.getElementById('notationGameStart').style.display = 'none';
     document.getElementById('notationGamePlay').style.display = 'block';
@@ -1226,6 +1321,7 @@ function checkAllMatchesResolved() {
     if (allResolved) {
         notationGameState.correctAnswers++;
         registerAnswerOutcome(notationGameState, true, 'notation');
+        playClickSound('add');
         triggerConfetti();
         const specialMessage = notationGameState.specialLevelUnlocked ? ' ¡Nivel especial desbloqueado! 🔓' : '';
         showNotationFeedback('✅', '¡Perfecto!', `Relacionaste todos los números correctamente.${specialMessage}`, true, 'Todas las parejas están bien');
@@ -1267,11 +1363,13 @@ function checkNotationAnswer() {
         if (isCorrect) {
             notationGameState.correctAnswers++;
             registerAnswerOutcome(notationGameState, true, 'notation');
+            playClickSound('add');
             triggerConfetti();
             const specialMessage = notationGameState.specialLevelUnlocked ? ' ¡Nivel especial desbloqueado! 🔓' : '';
             showNotationFeedback('✅', '¡Correcto!', `${coeff} × 10^${exp}${specialMessage}`, true, feedbackExpression);
         } else {
             registerAnswerOutcome(notationGameState, false, 'notation');
+            playClickSound('sub');
             const hint = exp === expected.exponent ? 'El coeficiente estaba cerca, pero no en el formato correcto.' : 'Observa cuántos lugares mueve la coma: si el número es grande, el exponente aumenta; si es pequeño, el exponente baja.';
             showNotationFeedback('❌', 'Incorrecto', `Tu respuesta fue: ${attemptedAnswer}. ${hint} La respuesta correcta es: ${expected.scientific}`, false, feedbackExpression);
         }
@@ -1298,11 +1396,13 @@ function checkNotationAnswer() {
         if (isCorrect) {
             notationGameState.correctAnswers++;
             registerAnswerOutcome(notationGameState, true, 'notation');
+            playClickSound('add');
             triggerConfetti();
             const specialMessage = notationGameState.specialLevelUnlocked ? ' ¡Nivel especial desbloqueado! 🔓' : '';
             showNotationFeedback('✅', '¡Correcto!', `${num.toLocaleString('es-CL', {maximumFractionDigits: 10})}${specialMessage}`, true, feedbackExpression);
         } else {
             registerAnswerOutcome(notationGameState, false, 'notation');
+            playClickSound('sub');
             const hint = notationGameState.currentNumber >= 1 ? 'Recuerda: el número grande tiene exponente positivo y la coma se mueve hacia la izquierda.' : 'Recuerda: el número pequeño tiene exponente negativo y la coma se mueve hacia la derecha.';
             showNotationFeedback('❌', 'Incorrecto', `Tu respuesta fue: ${attemptedAnswer}. ${hint} La respuesta correcta es: ${notationGameState.currentNumber.toLocaleString('es-CL', {maximumFractionDigits: 10})}`, false, feedbackExpression);
         }
@@ -1350,6 +1450,15 @@ function endNotationGame() {
     document.getElementById('notationGamePlay').style.display = 'none';
     document.getElementById('notationGameEnd').style.display = 'block';
     document.getElementById('notationFinalScore').textContent = notationGameState.correctAnswers;
+
+    if (notationGameState.correctAnswers >= 7) {
+        const previousLevel = notationGameState.level;
+        notationGameState.level = Math.min(3, notationGameState.level + 1);
+        if (notationGameState.level !== previousLevel) {
+            showComboBurst(`¡Nivel ${notationGameState.level} desbloqueado!`, 'notation', 260);
+        }
+    }
+    saveProgressSnapshot('notation', notationGameState);
     
     let message = '';
     if (notationGameState.correctAnswers === 10) {
@@ -1364,5 +1473,5 @@ function endNotationGame() {
         message = '💪 ¡Vamos! Inténtalo de nuevo.';
     }
     
-    document.getElementById('notationFinalMessage').textContent = message;
+    document.getElementById('notationFinalMessage').textContent = `${message} Nivel actual: ${notationGameState.level}`;
 }
