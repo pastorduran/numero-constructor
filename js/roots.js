@@ -83,7 +83,7 @@ function checkRootsAnswer() {
     const selected = question.options[rootsGameState.selectedOption];
 
     if (!selected) {
-        showRootFeedback('⚠️', 'Elige una opción', 'Selecciona una respuesta antes de verificar.', '');
+        showRootValidationWarning();
         return;
     }
 
@@ -110,6 +110,19 @@ function showRootFeedback(icon, title, message, expression) {
     expressionElement.style.display = expression ? 'block' : 'none';
     document.getElementById('feedbackModal').querySelector('.feedback-btn').onclick = closeRootsFeedback;
     document.getElementById('feedbackModal').style.display = 'flex';
+}
+
+function showRootValidationWarning() {
+    document.getElementById('feedbackIcon').textContent = '⚠️';
+    document.getElementById('feedbackTitle').textContent = 'Elige una opción';
+    document.getElementById('feedbackMessage').textContent = 'Selecciona una respuesta antes de verificar.';
+    document.getElementById('feedbackExpression').style.display = 'none';
+    document.getElementById('feedbackModal').querySelector('.feedback-btn').onclick = closeRootValidationWarning;
+    document.getElementById('feedbackModal').style.display = 'flex';
+}
+
+function closeRootValidationWarning() {
+    document.getElementById('feedbackModal').style.display = 'none';
 }
 
 function closeRootsFeedback() {
