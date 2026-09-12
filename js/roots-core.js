@@ -63,6 +63,10 @@
         }));
     }
 
+    function questionKey(question) {
+        return `${question.type}|${question.prompt}|${question.answer}`;
+    }
+
     function createExactQuestion() {
         const value = Math.floor(Math.random() * 11) + 2;
         const radicand = value * value;
@@ -71,7 +75,8 @@
             prompt: `Calcula ${rootText(2, radicand)}.`,
             answer: `${value}`,
             options: optionsFor(`${value}`, [`${value + 1}`, `${value - 1}`, `${radicand}`]),
-            explanation: `${rootText(2, radicand)} = ${value} porque ${value}² = ${radicand}.`
+            explanation: `${rootText(2, radicand)} = ${value} porque ${value}² = ${radicand}.`,
+            key: `exact|${radicand}|${value}`
         };
     }
 
@@ -87,7 +92,8 @@
             options: optionsFor(answer, [isEven ? 'Sí, es real' : 'No, no es real', 'Solo si se cambia el índice']),
             explanation: isEven
                 ? 'Una raíz de índice par con radicando negativo no tiene resultado real.'
-                : 'Una raíz de índice impar puede tener radicando negativo y conservar un resultado real.'
+                : 'Una raíz de índice impar puede tener radicando negativo y conservar un resultado real.',
+            key: `existence|${index}|${radicand}`
         };
     }
 
@@ -101,7 +107,8 @@
             prompt: `Simplifica ${rootText(2, radicand)}.`,
             answer,
             options: optionsFor(answer, [`${outside}√${inside + 1}`, `√${outside * inside}`, `${outside * inside}`]),
-            explanation: `${rootText(2, radicand)} = ${rootText(2, outside * outside)} · ${rootText(2, inside)} = ${answer}.`
+            explanation: `${rootText(2, radicand)} = ${rootText(2, outside * outside)} · ${rootText(2, inside)} = ${answer}.`,
+            key: `simplify|${radicand}`
         };
     }
 
@@ -114,7 +121,8 @@
             prompt: `Reduce ${rootText(2, first)} · ${rootText(2, second)}.`,
             answer,
             options: optionsFor(answer, [rootText(2, first + second), `${first + second}`, simplifiedText(first) + simplifiedText(second)]),
-            explanation: `√${first} · √${second} = √${first * second} = ${answer}.`
+            explanation: `√${first} · √${second} = √${first * second} = ${answer}.`,
+            key: `product|${first}|${second}`
         };
     }
 
@@ -128,7 +136,8 @@
             prompt: `Reduce √${radicand} / √${divisor}.`,
             answer,
             options: optionsFor(answer, [`√${radicand - divisor}`, `${radicand / divisor}`, simplifiedText(radicand)]),
-            explanation: `√${radicand} / √${divisor} = √(${radicand}/${divisor}) = ${answer}.`
+            explanation: `√${radicand} / √${divisor} = √(${radicand}/${divisor}) = ${answer}.`,
+            key: `quotient|${radicand}|${divisor}`
         };
     }
 
@@ -140,7 +149,8 @@
             prompt: `Calcula √(∛${value}).`,
             answer,
             options: optionsFor(answer, [`${answer + 1}`, `${Math.round(Math.sqrt(value))}`, `${value}`]),
-            explanation: `√(∛${value}) equivale a una raíz sexta: √[6]${value} = ${answer}.`
+            explanation: `√(∛${value}) equivale a una raíz sexta: √[6]${value} = ${answer}.`,
+            key: `nested|${value}`
         };
     }
 
@@ -152,7 +162,8 @@
             prompt: `Calcula √(${value}²).`,
             answer,
             options: optionsFor(answer, [`-${value}`, `${value * value}`, `${value + 2}`]),
-            explanation: `La raíz cuadrada principal es no negativa: √(${value}²) = ${value}.`
+            explanation: `La raíz cuadrada principal es no negativa: √(${value}²) = ${value}.`,
+            key: `power|${value}`
         };
     }
 
@@ -164,7 +175,8 @@
             prompt: `Racionaliza 1/√${radicand}.`,
             answer,
             options: optionsFor(answer, [`1/${radicand}`, `√${radicand}`, `√${radicand}/${radicand + 1}`]),
-            explanation: `Multiplica numerador y denominador por √${radicand}: 1/√${radicand} = √${radicand}/${radicand}.`
+            explanation: `Multiplica numerador y denominador por √${radicand}: 1/√${radicand} = √${radicand}/${radicand}.`,
+            key: `rationalize|${radicand}`
         };
     }
 
@@ -174,7 +186,8 @@
             prompt: 'Racionaliza 1/(√2 + √3).',
             answer: '√3 - √2',
             options: optionsFor('√3 - √2', ['√3 + √2', '√2 - √3', '(√3 - √2)/2']),
-            explanation: 'Multiplica por el conjugado (√3 - √2): el denominador queda 3 - 2 = 1.'
+            explanation: 'Multiplica por el conjugado (√3 - √2): el denominador queda 3 - 2 = 1.',
+            key: 'conjugate|2|3'
         };
     }
 
@@ -188,8 +201,26 @@
         return questions[Math.floor(Math.random() * questions.length)]();
     }
 
-    function generateQuestions(level = 1, total = 10) {
-        return Array.from({ length: total }, () => createQuestion(Math.min(3, Math.max(1, level))));
+    function generateQuestions(level = 1, total = 10, recentKeys = []) {
+        const questions = [];
+        const usedKeys = new Set(recentKeys);
+        let attempts = 0;
+
+        while (questions.length < total && attempts < total * 100) {
+            const question = createQuestion(Math.min(3, Math.max(1, level)));
+            const key = question.key || questionKey(question);
+            if (!usedKeys.has(key)) {
+                usedKeys.add(key);
+                questions.push(question);
+            }
+            attempts++;
+        }
+
+        while (questions.length < total) {
+            questions.push(createQuestion(Math.min(3, Math.max(1, level))));
+        }
+
+        return questions;
     }
 
     function evaluateFree(index, radicand) {

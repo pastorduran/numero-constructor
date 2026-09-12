@@ -271,7 +271,8 @@ function startGame() {
     gameState.combo = 1;
     gameState.specialLevelUnlocked = false;
     gameState.selectedOption = null;
-    gameState.questions = generateRandomNumbers(gameState.level);
+    gameState.questions = generateRandomNumbers(gameState.level, window.AppStorage.getRecentQuestions('composition'));
+    window.AppStorage.rememberQuestions('composition', gameState.questions.map(question => question.key));
 
     // Ocultar pantalla de inicio
     document.getElementById('gameStart').style.display = 'none';
@@ -813,7 +814,7 @@ function buildMatchingNotationQuestion() {
     };
 }
 
-function generateNotationQuestions(level = 1) {
+function generateNotationQuestions(level = 1, recentKeys = []) {
     const totalQuestions = 10;
     const themeIndexes = [1, 5, 8];
     const questions = Array(totalQuestions).fill(null);
@@ -822,8 +823,9 @@ function generateNotationQuestions(level = 1) {
     const exponentRange = level >= 3 ? 25 : 20;
 
     // 3 preguntas temáticas distribuidas a lo largo del desafío
+    const availableThemes = shuffleArray(notationThemeBank.filter(theme => !recentKeys.includes(`${theme.type}|${theme.displayValue}`)));
     for (let i = 0; i < themeIndexes.length; i++) {
-        const themeQuestion = notationThemeBank[Math.floor(Math.random() * notationThemeBank.length)];
+        const themeQuestion = availableThemes[i % availableThemes.length];
         questions[themeIndexes[i]] = {
             ...themeQuestion,
             themed: true,
@@ -860,7 +862,26 @@ function generateNotationQuestions(level = 1) {
         }
     }
 
-    return questions;
+    const usedKeys = new Set(recentKeys);
+    return questions.map((question, index) => {
+        const nextQuestion = { ...question };
+        let key = nextQuestion.type === 'toScientific'
+            ? `${nextQuestion.type}|${nextQuestion.displayValue || nextQuestion.number}`
+            : nextQuestion.type === 'toNumber'
+                ? `${nextQuestion.type}|${nextQuestion.displayValue || `${nextQuestion.coefficient}|${nextQuestion.exponent}`}`
+                : `${nextQuestion.type}|${nextQuestion.matchData.pairs.map(pair => pair.id).join('|')}`;
+
+        if (usedKeys.has(key) && nextQuestion.type === 'toScientific' && !nextQuestion.themed) {
+            nextQuestion.number += index + 1;
+            key = `${nextQuestion.type}|${nextQuestion.number}`;
+        } else if (usedKeys.has(key) && nextQuestion.type === 'toNumber' && !nextQuestion.themed) {
+            nextQuestion.coefficient += index + 1;
+            key = `${nextQuestion.type}|${nextQuestion.coefficient}|${nextQuestion.exponent}`;
+        }
+
+        usedKeys.add(key);
+        return { ...nextQuestion, key };
+    });
 }
 
 // Iniciar juego de notación
@@ -873,7 +894,11 @@ function startNotationGame() {
     notationGameState.combo = 1;
     notationGameState.level = saved.notationLevel || 1;
     notationGameState.specialLevelUnlocked = false;
-    notationGameState.questions = generateNotationQuestions(notationGameState.level);
+    notationGameState.questions = generateNotationQuestions(
+        notationGameState.level,
+        window.AppStorage.getRecentQuestions('notation')
+    );
+    window.AppStorage.rememberQuestions('notation', notationGameState.questions.map(question => question.key));
     
     document.getElementById('notationGameStart').style.display = 'none';
     document.getElementById('notationGamePlay').style.display = 'block';

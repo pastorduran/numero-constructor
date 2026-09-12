@@ -8,7 +8,10 @@ window.AppStorage = Object.freeze({
                 rootsLevel: Math.max(1, Number(saved.rootsLevel) || 1),
                 bestComposition: Number(saved.bestComposition) || 0,
                 bestNotation: Number(saved.bestNotation) || 0,
-                bestRoots: Number(saved.bestRoots) || 0
+                bestRoots: Number(saved.bestRoots) || 0,
+                recentQuestions: saved.recentQuestions && typeof saved.recentQuestions === 'object'
+                    ? saved.recentQuestions
+                    : {}
             };
         } catch (error) {
             return {
@@ -17,7 +20,8 @@ window.AppStorage = Object.freeze({
                 rootsLevel: 1,
                 bestComposition: 0,
                 bestNotation: 0,
-                bestRoots: 0
+                bestRoots: 0,
+                recentQuestions: {}
             };
         }
     },
@@ -36,6 +40,31 @@ window.AppStorage = Object.freeze({
 
         try {
             localStorage.setItem(window.AppConfig.STORAGE_KEY, JSON.stringify(next));
+        } catch (error) {
+            // La aplicación continúa funcionando aunque el almacenamiento no esté disponible.
+        }
+    },
+
+    getRecentQuestions(moduleKey) {
+        const progress = this.getProgress();
+        return Array.isArray(progress.recentQuestions[moduleKey])
+            ? progress.recentQuestions[moduleKey]
+            : [];
+    },
+
+    rememberQuestions(moduleKey, keys, limit = 30) {
+        const progress = window.AppStorage.getProgress();
+        const previous = window.AppStorage.getRecentQuestions(moduleKey);
+        const recentQuestions = {
+            ...progress.recentQuestions,
+            [moduleKey]: [...new Set([...previous, ...keys])].slice(-limit)
+        };
+
+        try {
+            localStorage.setItem(window.AppConfig.STORAGE_KEY, JSON.stringify({
+                ...progress,
+                recentQuestions
+            }));
         } catch (error) {
             // La aplicación continúa funcionando aunque el almacenamiento no esté disponible.
         }

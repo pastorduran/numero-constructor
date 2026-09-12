@@ -1,7 +1,7 @@
 (function () {
 const compositionDenominations = window.AppConfig.denominations;
 
-function generateRandomNumbers(level = 1) {
+function generateRandomNumbers(level = 1, recentKeys = []) {
     const questions = [];
     const totalQuestions = 10;
     const questionTypes = ['selector', 'normal', 'exponential', 'selector', 'normal', 'exponential', 'selector', 'normal', 'exponential', 'selector'];
@@ -25,9 +25,28 @@ function generateRandomNumbers(level = 1) {
         questions.push({ number: num, emphasizeZeros: true });
     }
 
-    return questions
+    const generated = questions
         .sort(() => Math.random() - 0.5)
         .map((question, index) => ({ ...question, type: questionTypes[index] }));
+
+    const usedKeys = new Set(recentKeys);
+    return generated.map(question => {
+        let candidate = question;
+        let key = `${candidate.type}|${candidate.number}|${candidate.emphasizeZeros}`;
+        let attempts = 0;
+
+        while (usedKeys.has(key) && attempts < 100) {
+            const number = candidate.emphasizeZeros
+                ? generateNumberWithZeros()
+                : Math.floor(Math.random() * maxRange) + 1;
+            candidate = { ...candidate, number };
+            key = `${candidate.type}|${candidate.number}|${candidate.emphasizeZeros}`;
+            attempts++;
+        }
+
+        usedKeys.add(key);
+        return { ...candidate, key };
+    });
 }
 
 function generateNumberWithZeros() {

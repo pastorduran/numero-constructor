@@ -54,21 +54,28 @@ function processRootFree() {
 
 function startRootsGame() {
     const saved = window.AppStorage.getProgress();
+    const level = saved.rootsLevel || 1;
+    const questions = rootsCore.generateQuestions(
+        level,
+        10,
+        window.AppStorage.getRecentQuestions('roots')
+    );
     rootsGameState = {
         currentQuestion: 0,
         correctAnswers: 0,
-        questions: rootsCore.generateQuestions(saved.rootsLevel || 1),
+        questions,
         selectedOption: null,
         currentStreak: 0,
         bestStreak: 0,
         combo: 1,
-        level: saved.rootsLevel || 1,
+        level,
         specialLevelUnlocked: false
     };
 
     document.getElementById('rootsGameStart').style.display = 'none';
     document.getElementById('rootsGamePlay').style.display = 'block';
     document.getElementById('rootsGameEnd').style.display = 'none';
+    window.AppStorage.rememberQuestions('roots', questions.map(question => question.key), 12);
     loadRootsQuestion();
 }
 
@@ -158,6 +165,11 @@ function endRootsGame() {
     document.getElementById('rootsGamePlay').style.display = 'none';
     document.getElementById('rootsGameEnd').style.display = 'block';
     document.getElementById('rootsFinalScore').textContent = rootsGameState.correctAnswers;
+    if (rootsGameState.correctAnswers >= 7) {
+        rootsGameState.level = Math.min(3, rootsGameState.level + 1);
+        window.AppStorage.saveSnapshot('roots', rootsGameState);
+    }
+
     const message = rootsGameState.correctAnswers >= 8
         ? '¡Excelente dominio de las raíces!'
         : rootsGameState.correctAnswers >= 5
