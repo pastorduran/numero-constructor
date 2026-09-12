@@ -94,6 +94,7 @@ La aplicación usa capas sencillas sin necesidad de un bundler:
 
 - `js/config.js`: configuración compartida, denominaciones y fábricas de estado inicial.
 - `js/storage.js`: lectura y escritura del progreso en `localStorage`.
+- `js/storage.js`: también conserva `errorCounts` por módulo y tipo de habilidad para orientar futuras prácticas.
 - `js/composition-core.js`: generación de preguntas y respuestas de composición, sin dependencia del DOM.
 - `js/notation-core.js`: conversiones y análisis de números científicos, sin dependencia del DOM.
 - `js/challenge-ui.js`: efectos, HUD, rachas y persistencia visual compartida por los desafíos.

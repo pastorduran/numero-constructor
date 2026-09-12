@@ -125,7 +125,7 @@ function checkRootsAnswer() {
         rootsUi.triggerConfetti();
         showRootFeedback('✅', '¡Correcto!', question.explanation, question.answer);
     } else {
-        rootsUi.registerAnswerOutcome(rootsGameState, false, 'roots');
+        rootsUi.registerAnswerOutcome(rootsGameState, false, 'roots', question.type);
         rootsUi.playClickSound('sub');
         showRootFeedback('❌', 'Incorrecto', question.explanation, `Respuesta correcta: ${question.answer}`);
     }

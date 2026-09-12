@@ -96,7 +96,7 @@
         }
     }
 
-    function registerAnswerOutcome(state, isCorrect, key = 'game') {
+    function registerAnswerOutcome(state, isCorrect, key = 'game', errorType = 'general') {
         const previousCombo = state.combo;
         const previousLevel = state.level;
 
@@ -115,6 +115,7 @@
 
         updateChallengeHud(state, key);
         window.AppStorage.saveSnapshot(key, state);
+        if (!isCorrect) window.AppStorage.recordError(key, errorType);
 
         if (isCorrect && state.combo !== previousCombo) {
             showComboBurst(`¡Poder x${state.combo}!`, key, 320);

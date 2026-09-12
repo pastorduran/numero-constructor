@@ -11,6 +11,9 @@ window.AppStorage = Object.freeze({
                 bestRoots: Number(saved.bestRoots) || 0,
                 recentQuestions: saved.recentQuestions && typeof saved.recentQuestions === 'object'
                     ? saved.recentQuestions
+                    : {},
+                errorCounts: saved.errorCounts && typeof saved.errorCounts === 'object'
+                    ? saved.errorCounts
                     : {}
             };
         } catch (error) {
@@ -21,7 +24,8 @@ window.AppStorage = Object.freeze({
                 bestComposition: 0,
                 bestNotation: 0,
                 bestRoots: 0,
-                recentQuestions: {}
+                recentQuestions: {},
+                errorCounts: {}
             };
         }
     },
@@ -50,6 +54,27 @@ window.AppStorage = Object.freeze({
         return Array.isArray(progress.recentQuestions[moduleKey])
             ? progress.recentQuestions[moduleKey]
             : [];
+    },
+
+    recordError(moduleKey, errorType) {
+        const progress = this.getProgress();
+        const moduleErrors = progress.errorCounts[moduleKey] || {};
+        const errorCounts = {
+            ...progress.errorCounts,
+            [moduleKey]: {
+                ...moduleErrors,
+                [errorType]: (moduleErrors[errorType] || 0) + 1
+            }
+        };
+
+        try {
+            localStorage.setItem(window.AppConfig.STORAGE_KEY, JSON.stringify({
+                ...progress,
+                errorCounts
+            }));
+        } catch (error) {
+            // La aplicación continúa funcionando aunque el almacenamiento no esté disponible.
+        }
     },
 
     rememberQuestions(moduleKey, keys, limit = 30) {

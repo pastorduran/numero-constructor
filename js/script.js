@@ -416,6 +416,9 @@ function gameChangeMoney(value, delta) {
 // Verificar respuesta
 function checkAnswer() {
     const question = gameState.questions[gameState.currentQuestion];
+    const selectedOption = question.type === 'selector'
+        ? null
+        : gameState.questionOptions[gameState.selectedOption];
     const isCorrect = question.type === 'selector'
         ? JSON.stringify(gameState.gameState) === JSON.stringify(gameState.targetAnswers)
         : gameState.questionOptions[gameState.selectedOption]?.correct === true;
@@ -429,7 +432,10 @@ function checkAnswer() {
         const specialMessage = gameState.specialLevelUnlocked ? ' ¡Nivel especial desbloqueado! 🔓' : '';
         showFeedback('✅', '¡Correcto!', `Muy bien, lo hiciste perfecto.${specialMessage}`, expression);
     } else {
-        registerAnswerOutcome(gameState, false, 'game');
+        const errorType = question.type === 'selector'
+            ? 'valor-posicional'
+            : selectedOption?.errorType || (question.type === 'normal' ? 'descomposicion' : 'potencias-10');
+        registerAnswerOutcome(gameState, false, 'game', errorType);
         playClickSound('sub');
         const expression = generateExpression(gameState.currentNumber);
         showFeedback('❌', 'Incorrecto', 'Aquí está la respuesta correcta:', expression);
@@ -863,7 +869,7 @@ function generateNotationQuestions(level = 1, recentKeys = []) {
     }
 
     const usedKeys = new Set(recentKeys);
-    return questions.map((question, index) => {
+    return questions.sort(() => Math.random() - 0.5).map((question, index) => {
         const nextQuestion = { ...question };
         let key = nextQuestion.type === 'toScientific'
             ? `${nextQuestion.type}|${nextQuestion.displayValue || nextQuestion.number}`
@@ -1021,6 +1027,7 @@ function loadNotationQuestion() {
                     }
                     checkAllMatchesResolved();
                 } else {
+                    window.AppStorage.recordError('notation', 'relacion-equivalencias');
                     slot.classList.add('match-error');
                     const originalText = slot.innerHTML;
                     slot.innerHTML = '<span class="match-slot-hint">Intenta otra vez</span>';
@@ -1133,7 +1140,7 @@ function checkNotationAnswer() {
             const specialMessage = notationGameState.specialLevelUnlocked ? ' ¡Nivel especial desbloqueado! 🔓' : '';
             showNotationFeedback('✅', '¡Correcto!', `${coeff} × 10^${exp}${specialMessage}`, true, feedbackExpression);
         } else {
-            registerAnswerOutcome(notationGameState, false, 'notation');
+            registerAnswerOutcome(notationGameState, false, 'notation', 'coeficiente-exponente');
             playClickSound('sub');
             const hint = exp === expected.exponent ? 'El coeficiente estaba cerca, pero no en el formato correcto.' : 'Observa cuántos lugares mueve la coma: si el número es grande, el exponente aumenta; si es pequeño, el exponente baja.';
             showNotationFeedback('❌', 'Incorrecto', `Tu respuesta fue: ${attemptedAnswer}. ${hint}`, false, feedbackExpression);
@@ -1166,7 +1173,7 @@ function checkNotationAnswer() {
             const specialMessage = notationGameState.specialLevelUnlocked ? ' ¡Nivel especial desbloqueado! 🔓' : '';
             showNotationFeedback('✅', '¡Correcto!', `${num.toLocaleString('es-CL', {maximumFractionDigits: 10})}${specialMessage}`, true, feedbackExpression);
         } else {
-            registerAnswerOutcome(notationGameState, false, 'notation');
+            registerAnswerOutcome(notationGameState, false, 'notation', 'movimiento-coma');
             playClickSound('sub');
             const hint = notationGameState.currentNumber >= 1 ? 'Recuerda: el número grande tiene exponente positivo y la coma se mueve hacia la izquierda.' : 'Recuerda: el número pequeño tiene exponente negativo y la coma se mueve hacia la derecha.';
             showNotationFeedback('❌', 'Incorrecto', `Tu respuesta fue: ${attemptedAnswer}. ${hint} La respuesta correcta es: ${notationGameState.currentNumber.toLocaleString('es-CL', {maximumFractionDigits: 10})}`, false, feedbackExpression);

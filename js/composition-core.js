@@ -4,7 +4,11 @@ const compositionDenominations = window.AppConfig.denominations;
 function generateRandomNumbers(level = 1, recentKeys = []) {
     const questions = [];
     const totalQuestions = 10;
-    const questionTypes = ['selector', 'normal', 'exponential', 'selector', 'normal', 'exponential', 'selector', 'normal', 'exponential', 'selector'];
+    const questionTypes = level >= 3
+        ? ['selector', 'selector', 'selector', 'normal', 'normal', 'normal', 'exponential', 'exponential', 'exponential', 'normal']
+        : level === 2
+            ? ['selector', 'selector', 'selector', 'normal', 'normal', 'normal', 'exponential', 'exponential', 'exponential', 'selector']
+            : ['selector', 'selector', 'selector', 'selector', 'normal', 'normal', 'normal', 'exponential', 'exponential', 'exponential'];
     const zeroQuestionsCount = 3 + (level >= 2 ? 1 : 0);
     const normalQuestionsCount = totalQuestions - zeroQuestionsCount;
     const maxRange = level >= 3 ? 99999999 : 9999999;
@@ -25,9 +29,13 @@ function generateRandomNumbers(level = 1, recentKeys = []) {
         questions.push({ number: num, emphasizeZeros: true });
     }
 
+    const shuffledTypes = questionTypes.sort(() => Math.random() - 0.5);
     const generated = questions
         .sort(() => Math.random() - 0.5)
-        .map((question, index) => ({ ...question, type: questionTypes[index] }));
+        .map((question, index) => ({
+            ...question,
+            type: shuffledTypes[index]
+        }));
 
     const usedKeys = new Set(recentKeys);
     return generated.map(question => {
@@ -143,8 +151,8 @@ function createCompositionOptions(num, type) {
 
     return [
         { expression: formatCompositionExpression(answer, type), correct: true },
-        { expression: formatCompositionExpression(incorrectAnswer, type), correct: false },
-        { expression: formatCompositionExpression(alternateAnswer, type), correct: false }
+        { expression: formatCompositionExpression(incorrectAnswer, type), correct: false, errorType: 'digit-off-by-one' },
+        { expression: formatCompositionExpression(alternateAnswer, type), correct: false, errorType: 'wrong-position' }
     ].sort(() => Math.random() - 0.5);
 }
 
