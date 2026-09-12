@@ -42,6 +42,20 @@ function processRootFree() {
         index: document.getElementById('rootIndexInput')?.value,
         first: operation === 'combine'
             ? document.getElementById('rootCombineFirstInput')?.value
+            : operation === 'quotient'
+                ? document.getElementById('rootQuotientFirstInput')?.value
+                : operation === 'nested'
+                    ? document.getElementById('rootNestedInput')?.value
+                    : operation === 'power'
+                        ? document.getElementById('rootPowerInput')?.value
+                        : operation === 'amplification'
+                            ? document.getElementById('rootAmplificationInput')?.value
+                            : operation === 'subtract'
+                                ? document.getElementById('rootSubtractFirstInput')?.value
+                                : operation === 'applied'
+                                    ? document.getElementById('rootAreaInput')?.value
+                                    : operation === 'equation'
+                                        ? document.getElementById('rootEquationInput')?.value
             : operation === 'like'
                 ? document.getElementById('rootLikeFirstInput')?.value
                 : operation === 'rationalize'
@@ -49,10 +63,16 @@ function processRootFree() {
                     : document.getElementById('rootFirstInput')?.value || document.getElementById('rootRadicandInput')?.value,
         second: operation === 'combine'
             ? document.getElementById('rootCombineSecondInput')?.value
+            : operation === 'quotient'
+                ? document.getElementById('rootQuotientSecondInput')?.value
+                : operation === 'subtract'
+                    ? document.getElementById('rootSubtractSecondInput')?.value
             : operation === 'like'
                 ? document.getElementById('rootLikeSecondInput')?.value
                 : undefined,
-        radicand: document.getElementById('rootLikeRadicandInput')?.value || document.getElementById('rootRadicandInput')?.value
+        radicand: operation === 'subtract'
+            ? document.getElementById('rootSubtractRadicandInput')?.value
+            : document.getElementById('rootLikeRadicandInput')?.value || document.getElementById('rootRadicandInput')?.value
     });
     const resultBox = document.getElementById('rootFreeResult');
 
@@ -76,8 +96,16 @@ function updateRootExplorerFields() {
         calculate: 'real',
         simplify: 'simplify',
         combine: 'properties',
+        quotient: 'properties',
+        nested: 'properties',
+        power: 'properties',
+        amplification: 'properties',
         like: 'properties',
+        subtract: 'properties',
         rationalize: 'rationalize'
+        ,conjugate: 'rationalize',
+        applied: 'real',
+        equation: 'real'
     };
     const concept = rootsCore.concepts.find(item => item.id === conceptByOperation[operation]);
     if (concept) {
@@ -85,21 +113,37 @@ function updateRootExplorerFields() {
             calculate: { index: 2, radicand: 25 },
             simplify: { first: 72 },
             combine: { first: 2, second: 8 },
+            quotient: { first: 12, second: 3 },
+            nested: { first: 64 },
+            power: { first: 6 },
+            amplification: { first: 2 },
             like: { first: 2, second: 5, radicand: 3 },
-            rationalize: { first: 3 }
+            subtract: { first: 7, second: 2, radicand: 3 },
+            rationalize: { first: 3 },
+            conjugate: {},
+            applied: { first: 49 },
+            equation: { first: 5 }
         }[operation];
 
         if (defaults.index) document.getElementById('rootIndexInput').value = defaults.index;
         if (defaults.radicand) document.getElementById('rootRadicandInput').value = defaults.radicand;
         if (defaults.first) {
-            const firstInput = document.getElementById(operation === 'combine' ? 'rootCombineFirstInput' : operation === 'like' ? 'rootLikeFirstInput' : operation === 'rationalize' ? 'rootRationalizeInput' : 'rootFirstInput');
+            const firstInputId = {
+                combine: 'rootCombineFirstInput', quotient: 'rootQuotientFirstInput', nested: 'rootNestedInput',
+                power: 'rootPowerInput', amplification: 'rootAmplificationInput', like: 'rootLikeFirstInput',
+                subtract: 'rootSubtractFirstInput', rationalize: 'rootRationalizeInput', applied: 'rootAreaInput',
+                equation: 'rootEquationInput'
+            }[operation] || 'rootFirstInput';
+            const firstInput = document.getElementById(firstInputId);
             if (firstInput) firstInput.value = defaults.first;
         }
         if (defaults.second) {
-            const secondInput = document.getElementById(operation === 'combine' ? 'rootCombineSecondInput' : 'rootLikeSecondInput');
+            const secondInputId = operation === 'combine' ? 'rootCombineSecondInput' : operation === 'quotient' ? 'rootQuotientSecondInput' : operation === 'subtract' ? 'rootSubtractSecondInput' : 'rootLikeSecondInput';
+            const secondInput = document.getElementById(secondInputId);
             if (secondInput) secondInput.value = defaults.second;
         }
         if (defaults.radicand && operation === 'like') document.getElementById('rootLikeRadicandInput').value = defaults.radicand;
+        if (defaults.radicand && operation === 'subtract') document.getElementById('rootSubtractRadicandInput').value = defaults.radicand;
         renderRootConceptDetails(concept);
     }
 }

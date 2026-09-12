@@ -307,11 +307,29 @@
                     <div class="root-operation-picker">
                         <label for="rootOperationSelect">¿Qué quieres explorar?</label>
                         <select id="rootOperationSelect" class="notation-input" onchange="updateRootExplorerFields()">
-                            <option value="calculate">Calcular una raíz</option>
-                            <option value="simplify">Simplificar un radical</option>
-                            <option value="combine">Multiplicar raíces</option>
-                            <option value="like">Sumar radicales semejantes</option>
-                            <option value="rationalize">Racionalizar una fracción</option>
+                            <optgroup label="Operaciones básicas">
+                                <option value="calculate">Calcular una raíz</option>
+                                <option value="simplify">Simplificar un radical</option>
+                                <option value="combine">Multiplicar raíces</option>
+                                <option value="quotient">Dividir raíces</option>
+                            </optgroup>
+                            <optgroup label="Propiedades">
+                                <option value="nested">Raíz de una raíz</option>
+                                <option value="power">Raíz de una potencia</option>
+                                <option value="amplification">Amplificar un radical</option>
+                            </optgroup>
+                            <optgroup label="Radicales semejantes">
+                                <option value="like">Sumar radicales semejantes</option>
+                                <option value="subtract">Restar radicales semejantes</option>
+                            </optgroup>
+                            <optgroup label="Fracciones">
+                                <option value="rationalize">Racionalizar una fracción</option>
+                                <option value="conjugate">Racionalizar con conjugado</option>
+                            </optgroup>
+                            <optgroup label="Aplicaciones">
+                                <option value="applied">Problema aplicado</option>
+                                <option value="equation">Ecuación irracional</option>
+                            </optgroup>
                         </select>
                     </div>
                     <div class="root-explorer-fields" data-root-fields="calculate">
@@ -332,6 +350,33 @@
                     </div>
                     <div class="root-explorer-fields" data-root-fields="rationalize" hidden>
                         <label for="rootRationalizeInput">Radicando del denominador:</label><input type="number" id="rootRationalizeInput" class="notation-input" min="2" value="3">
+                    </div>
+                    <div class="root-explorer-fields" data-root-fields="quotient" hidden>
+                        <label for="rootQuotientFirstInput">Primer radicando:</label><input type="number" id="rootQuotientFirstInput" class="notation-input" min="1" value="12">
+                        <label for="rootQuotientSecondInput">Segundo radicando:</label><input type="number" id="rootQuotientSecondInput" class="notation-input" min="1" value="3">
+                    </div>
+                    <div class="root-explorer-fields" data-root-fields="nested" hidden>
+                        <label for="rootNestedInput">Radicando:</label><input type="number" id="rootNestedInput" class="notation-input" min="1" value="64">
+                    </div>
+                    <div class="root-explorer-fields" data-root-fields="power" hidden>
+                        <label for="rootPowerInput">Base:</label><input type="number" id="rootPowerInput" class="notation-input" min="1" value="6">
+                    </div>
+                    <div class="root-explorer-fields" data-root-fields="amplification" hidden>
+                        <label for="rootAmplificationInput">Radicando:</label><input type="number" id="rootAmplificationInput" class="notation-input" min="2" value="2">
+                    </div>
+                    <div class="root-explorer-fields" data-root-fields="subtract" hidden>
+                        <label for="rootSubtractFirstInput">Primer coeficiente:</label><input type="number" id="rootSubtractFirstInput" class="notation-input" min="0" value="7">
+                        <label for="rootSubtractSecondInput">Segundo coeficiente:</label><input type="number" id="rootSubtractSecondInput" class="notation-input" min="0" value="2">
+                        <label for="rootSubtractRadicandInput">Radicando:</label><input type="number" id="rootSubtractRadicandInput" class="notation-input" min="1" value="3">
+                    </div>
+                    <div class="root-explorer-fields" data-root-fields="conjugate" hidden>
+                        <span class="root-operation-example">1/(√2 + √3)</span>
+                    </div>
+                    <div class="root-explorer-fields" data-root-fields="applied" hidden>
+                        <label for="rootAreaInput">Área del cuadrado:</label><input type="number" id="rootAreaInput" class="notation-input" min="1" value="49">
+                    </div>
+                    <div class="root-explorer-fields" data-root-fields="equation" hidden>
+                        <label for="rootEquationInput">Valor de la raíz:</label><input type="number" id="rootEquationInput" class="notation-input" min="1" value="5">
                     </div>
                     <button class="btn-primary" onclick="processRootFree()">Mostrar desarrollo</button>
                 </div>

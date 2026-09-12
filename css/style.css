@@ -1340,7 +1340,7 @@ button.control-btn[disabled] { opacity:0.55; transform:none; pointer-events:none
     align-items: center;
 }
 
-.root-concept-steps li span {
+.root-concept-steps li > span:first-child {
     display: inline-grid;
     place-items: center;
     width: 24px;

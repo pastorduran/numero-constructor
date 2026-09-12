@@ -343,6 +343,29 @@
             return { display, steps: [`√${first} · √${second} = √(${first} · ${second})`, `√${first * second} = ${display}`] };
         }
 
+        if (operation === 'quotient') {
+            const divisor = Number(values.second);
+            if (!Number.isInteger(first) || !Number.isInteger(divisor) || first <= 0 || divisor <= 0) return { error: 'Escribe dos radicandos enteros positivos.' };
+            const result = Math.sqrt(first / divisor);
+            return { display: Number.isInteger(result) ? `${result}` : `√(${first}/${divisor})`, steps: [`√${first} / √${divisor} = √(${first}/${divisor})`, `Resultado: ${Number.isInteger(result) ? result : `√(${first}/${divisor})`}.`] };
+        }
+
+        if (operation === 'nested') {
+            if (!Number.isInteger(first) || first <= 0) return { error: 'Escribe un radicando entero positivo.' };
+            const result = Math.round(Math.pow(first, 1 / 6));
+            return { display: `${result}`, steps: [`√(∛${first}) = √[6]${first}`, `√[6]${first} = ${result}.`] };
+        }
+
+        if (operation === 'power') {
+            if (!Number.isInteger(first) || first <= 0) return { error: 'Escribe una base entera positiva.' };
+            return { display: `${first}`, steps: [`√(${first}²)`, `Resultado: ${first}.`] };
+        }
+
+        if (operation === 'amplification') {
+            if (!Number.isInteger(first) || first <= 1) return { error: 'Escribe un radicando entero mayor que 1.' };
+            return { display: `√[6]${first ** 3}`, steps: [`√${first} = √[6]${first ** 3}`, 'Se multiplica el índice por 3 y se eleva el radicando al cubo.', `Resultado: √[6]${first ** 3}.`] };
+        }
+
         if (operation === 'like') {
             if (!Number.isInteger(first) || !Number.isInteger(second) || first < 0 || second < 0) {
                 return { error: 'Escribe dos coeficientes enteros no negativos.' };
@@ -352,9 +375,32 @@
             return { display: `${first + second}√${radicand}`, steps: [`${first}√${radicand} + ${second}√${radicand}`, `(${first} + ${second})√${radicand}`, `Resultado: ${first + second}√${radicand}.`] };
         }
 
+        if (operation === 'subtract') {
+            const radicand = Number(values.radicand);
+            if (!Number.isInteger(first) || !Number.isInteger(second) || !Number.isInteger(radicand) || first < 0 || second < 0 || radicand <= 0) return { error: 'Escribe coeficientes y radicando válidos.' };
+            return { display: `${first - second}√${radicand}`, steps: [`${first}√${radicand} - ${second}√${radicand}`, `(${first} - ${second})√${radicand}`, `Resultado: ${first - second}√${radicand}.`] };
+        }
+
         if (operation === 'rationalize') {
             if (!Number.isInteger(first) || first <= 1) return { error: 'Escribe un radicando mayor que 1.' };
             return { display: `√${first}/${first}`, steps: [`1/√${first}`, `Multiplica numerador y denominador por √${first}.`, `Resultado: √${first}/${first}.`] };
+        }
+
+        if (operation === 'conjugate') {
+            return { display: '√3 - √2', steps: ['1/(√2 + √3)', 'Multiplica por el conjugado (√3 - √2).', 'El denominador queda 3 - 2 = 1.', 'Resultado: √3 - √2.'] };
+        }
+
+        if (operation === 'applied') {
+            const area = Number(values.first);
+            const side = Math.sqrt(area);
+            if (!Number.isInteger(area) || area <= 0 || !Number.isInteger(side)) return { error: 'Escribe un área cuadrada positiva.' };
+            return { display: `${side} cm`, steps: [`Área = ${area} cm²`, `Lado = √${area}`, `Resultado: ${side} cm.`] };
+        }
+
+        if (operation === 'equation') {
+            const value = Number(values.first);
+            if (!Number.isInteger(value) || value <= 0) return { error: 'Escribe un valor entero positivo.' };
+            return { display: `${value ** 2}`, steps: [`√x = ${value}`, `Eleva ambos lados al cuadrado.`, `x = ${value}² = ${value ** 2}.`] };
         }
 
         return { error: 'Selecciona una operación válida.' };
