@@ -37,9 +37,23 @@ function getRootsHelpContext() {
 }
 
 function processRootFree() {
-    const index = Number(document.getElementById('rootIndexInput').value);
-    const radicand = Number(document.getElementById('rootRadicandInput').value);
-    const result = rootsCore.evaluateFree(index, radicand);
+    const operation = document.getElementById('rootOperationSelect')?.value || 'calculate';
+    const result = rootsCore.evaluateExplorer(operation, {
+        index: document.getElementById('rootIndexInput')?.value,
+        first: operation === 'combine'
+            ? document.getElementById('rootCombineFirstInput')?.value
+            : operation === 'like'
+                ? document.getElementById('rootLikeFirstInput')?.value
+                : operation === 'rationalize'
+                    ? document.getElementById('rootRationalizeInput')?.value
+                    : document.getElementById('rootFirstInput')?.value || document.getElementById('rootRadicandInput')?.value,
+        second: operation === 'combine'
+            ? document.getElementById('rootCombineSecondInput')?.value
+            : operation === 'like'
+                ? document.getElementById('rootLikeSecondInput')?.value
+                : undefined,
+        radicand: document.getElementById('rootLikeRadicandInput')?.value || document.getElementById('rootRadicandInput')?.value
+    });
     const resultBox = document.getElementById('rootFreeResult');
 
     resultBox.classList.remove('root-error');
@@ -49,11 +63,80 @@ function processRootFree() {
         return;
     }
 
+    resultBox.innerHTML = `<strong>${MathDisplay.format(result.display || '')}</strong><ol class="root-concept-steps root-result-steps">${(result.steps || []).map((step, index) => `<li><span>${index + 1}</span>${MathDisplay.format(step)}</li>`).join('')}</ol>`;
+}
+
+function updateRootExplorerFields() {
+    const operation = document.getElementById('rootOperationSelect').value;
+    document.querySelectorAll('.root-explorer-fields').forEach(field => field.hidden = true);
+    document.querySelector(`[data-root-fields="${operation}"]`).hidden = false;
+    document.getElementById('rootFreeResult').textContent = 'Completa los valores y pulsa calcular para ver el desarrollo.';
+
+    const conceptByOperation = {
+        calculate: 'real',
+        simplify: 'simplify',
+        combine: 'properties',
+        like: 'properties',
+        rationalize: 'rationalize'
+    };
+    const concept = rootsCore.concepts.find(item => item.id === conceptByOperation[operation]);
+    if (concept) {
+        const defaults = {
+            calculate: { index: 2, radicand: 25 },
+            simplify: { first: 72 },
+            combine: { first: 2, second: 8 },
+            like: { first: 2, second: 5, radicand: 3 },
+            rationalize: { first: 3 }
+        }[operation];
+
+        if (defaults.index) document.getElementById('rootIndexInput').value = defaults.index;
+        if (defaults.radicand) document.getElementById('rootRadicandInput').value = defaults.radicand;
+        if (defaults.first) {
+            const firstInput = document.getElementById(operation === 'combine' ? 'rootCombineFirstInput' : operation === 'like' ? 'rootLikeFirstInput' : operation === 'rationalize' ? 'rootRationalizeInput' : 'rootFirstInput');
+            if (firstInput) firstInput.value = defaults.first;
+        }
+        if (defaults.second) {
+            const secondInput = document.getElementById(operation === 'combine' ? 'rootCombineSecondInput' : 'rootLikeSecondInput');
+            if (secondInput) secondInput.value = defaults.second;
+        }
+        if (defaults.radicand && operation === 'like') document.getElementById('rootLikeRadicandInput').value = defaults.radicand;
+        renderRootConceptDetails(concept);
+    }
+}
+
+function renderRootConceptDetails(concept) {
+    document.querySelectorAll('.root-concept-card').forEach(card => {
+        const isSelected = card.dataset.conceptId === concept.id;
+        card.hidden = !isSelected;
+        card.classList.toggle('selected', isSelected);
+    });
+    document.getElementById('rootConceptTitle').textContent = concept.title;
+    document.getElementById('rootConceptText').innerHTML = MathDisplay.format(concept.text);
+    document.getElementById('rootConceptExample').innerHTML = MathDisplay.format(concept.example);
+    document.getElementById('rootConceptSteps').innerHTML = concept.steps
+        .map((step, index) => `<li><span>${index + 1}</span>${MathDisplay.format(step)}</li>`)
+        .join('');
+}
+
+function selectRootConcept(conceptId) {
+    const concept = rootsCore.concepts.find(item => item.id === conceptId);
+    if (!concept) return;
+
+    document.getElementById('rootOperationSelect').value = concept.id === 'simplify' ? 'simplify' : concept.id === 'rationalize' ? 'rationalize' : 'calculate';
+    updateRootExplorerFields();
+    document.getElementById('rootIndexInput').value = concept.index;
+    document.getElementById('rootRadicandInput').value = concept.radicand;
+    document.getElementById('rootFirstInput').value = concept.radicand;
+    const resultBox = document.getElementById('rootFreeResult');
+    resultBox.classList.remove('root-error');
     resultBox.innerHTML = `
-        <strong>${MathDisplay.format(`${rootsCore.rootText(index, radicand)} = ${result.display}`)}</strong>
-        <p>${MathDisplay.format(result.definition.text)}</p>
-        <span>${MathDisplay.format(result.definition.example)}</span>
+        <strong>${MathDisplay.format(concept.example)}</strong>
+        <p>${MathDisplay.format(concept.text)}</p>
+        <ol class="root-concept-steps root-result-steps">
+            ${concept.steps.map((step, index) => `<li><span>${index + 1}</span>${MathDisplay.format(step)}</li>`).join('')}
+        </ol>
     `;
+    renderRootConceptDetails(concept);
 }
 
 function startRootsGame() {

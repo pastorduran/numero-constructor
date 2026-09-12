@@ -1,31 +1,53 @@
 (function () {
-    const definitions = Object.freeze([
+    const concepts = Object.freeze([
         {
+            id: 'real',
             title: 'Raíz real',
             text: 'La raíz n-ésima de a es el número b que cumple b^n = a.',
-            example: '√25 = 5 porque 5² = 25.'
+            example: '√25 = 5 porque 5² = 25.',
+            index: 2,
+            radicand: 25,
+            steps: ['Identifica el radicando: 25.', 'Busca el número que elevado al cuadrado produce 25.', '√25 = 5.']
         },
         {
+            id: 'existence',
             title: 'Condición de existencia',
             text: 'Si el índice es par, el radicando debe ser positivo o cero para que la raíz sea real. Con índice impar, también se admiten radicandos negativos.',
-            example: '√(-9) no es real, pero ∛(-8) = -2.'
+            example: '√(-9) no es real, pero ∛(-8) = -2.',
+            index: 3,
+            radicand: -8,
+            steps: ['El índice es impar: 3.', 'Los índices impares admiten radicandos negativos.', '∛(-8) = -2.']
         },
         {
+            id: 'properties',
             title: 'Propiedades',
             text: 'Producto, cociente, potencia y raíz de una raíz pueden transformarse combinando índices y radicandos.',
-            example: '√a · √b = √(ab) y √[m](√[n]a) = √[mn]a.'
+            example: '√a · √b = √(ab) y √[m](√[n]a) = √[mn]a.',
+            index: 2,
+            radicand: 16,
+            steps: ['Producto: √a · √b = √(ab).', 'Ejemplo: √2 · √8 = √16.', '√16 = 4.']
         },
         {
+            id: 'simplify',
             title: 'Simplificación',
             text: 'Extrae del radical los factores que sean potencias perfectas y conserva dentro solo la parte que no se puede extraer.',
-            example: '√72 = √(36 · 2) = 6√2.'
+            example: '√72 = √(36 · 2) = 6√2.',
+            index: 2,
+            radicand: 72,
+            steps: ['Busca un cuadrado perfecto: 72 = 36 × 2.', 'Separa las raíces: √72 = √36 · √2.', 'Resultado: 6√2.']
         },
         {
+            id: 'rationalize',
             title: 'Racionalización',
             text: 'Transforma una fracción para que el denominador no contenga raíces.',
-            example: '1/√3 = √3/3.'
+            example: '1/√3 = √3/3.',
+            index: 2,
+            radicand: 3,
+            steps: ['Multiplica arriba y abajo por √3.', 'El denominador queda √3 · √3 = 3.', 'Resultado: √3/3.']
         }
     ]);
+
+    const definitions = concepts;
 
     function simplifySquareRoot(value) {
         let outside = 1;
@@ -294,11 +316,57 @@
         };
     }
 
+    function evaluateExplorer(operation, values) {
+        const first = Number(values.first);
+        const second = Number(values.second);
+
+        if (operation === 'calculate') {
+            return evaluateFree(Number(values.index), first);
+        }
+
+        if (operation === 'simplify') {
+            if (!Number.isInteger(first) || first <= 0) return { error: 'Escribe un radicando entero positivo.' };
+            const result = simplifySquareRoot(first);
+            const display = result.inside === 1 ? `${result.outside}` : result.outside === 1 ? `√${result.inside}` : `${result.outside}√${result.inside}`;
+            return {
+                display,
+                steps: [`${rootText(2, first)} = ${rootText(2, result.outside * result.outside)} · ${rootText(2, result.inside)}`, `${rootText(2, first)} = ${result.outside === 1 ? display : `${result.outside} · √${result.inside}`}`, `Resultado: ${display}.`]
+            };
+        }
+
+        if (operation === 'combine') {
+            if (!Number.isInteger(first) || !Number.isInteger(second) || first <= 0 || second <= 0) {
+                return { error: 'Escribe dos radicandos enteros positivos.' };
+            }
+            const result = simplifySquareRoot(first * second);
+            const display = result.inside === 1 ? `${result.outside}` : result.outside === 1 ? `√${result.inside}` : `${result.outside}√${result.inside}`;
+            return { display, steps: [`√${first} · √${second} = √(${first} · ${second})`, `√${first * second} = ${display}`] };
+        }
+
+        if (operation === 'like') {
+            if (!Number.isInteger(first) || !Number.isInteger(second) || first < 0 || second < 0) {
+                return { error: 'Escribe dos coeficientes enteros no negativos.' };
+            }
+            const radicand = Number(values.radicand);
+            if (!Number.isInteger(radicand) || radicand <= 0) return { error: 'Escribe un radicando entero positivo.' };
+            return { display: `${first + second}√${radicand}`, steps: [`${first}√${radicand} + ${second}√${radicand}`, `(${first} + ${second})√${radicand}`, `Resultado: ${first + second}√${radicand}.`] };
+        }
+
+        if (operation === 'rationalize') {
+            if (!Number.isInteger(first) || first <= 1) return { error: 'Escribe un radicando mayor que 1.' };
+            return { display: `√${first}/${first}`, steps: [`1/√${first}`, `Multiplica numerador y denominador por √${first}.`, `Resultado: √${first}/${first}.`] };
+        }
+
+        return { error: 'Selecciona una operación válida.' };
+    }
+
     window.RootsCore = Object.freeze({
+        concepts,
         definitions,
         generateQuestions,
         evaluateFree,
         simplifiedText,
-        rootText
+        rootText,
+        evaluateExplorer
     });
 })();

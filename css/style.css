@@ -1221,6 +1221,37 @@ button.control-btn[disabled] { opacity:0.55; transform:none; pointer-events:none
     line-height: 1.6;
 }
 
+.root-operation-picker,
+.root-explorer-fields {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+
+.root-explorer-fields[hidden] {
+    display: none;
+}
+
+.root-operation-picker label,
+.root-explorer-fields label {
+    color: #2c3e50;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.root-operation-picker select,
+.root-explorer-fields input {
+    flex: 1 1 130px;
+    min-width: 120px;
+}
+
+.root-result-steps {
+    margin-top: 1rem;
+    margin-bottom: 0;
+}
+
 .root-result strong {
     color: #2c3e50;
     font-size: 1.15rem;
@@ -1240,6 +1271,85 @@ button.control-btn[disabled] { opacity:0.55; transform:none; pointer-events:none
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 14px;
+}
+
+.root-concept-card {
+    border: 2px solid #e9ecef;
+    background: #fff;
+    border-radius: 10px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.3rem;
+    text-align: left;
+    cursor: pointer;
+    color: #2c3e50;
+}
+
+.root-concept-card span {
+    color: #667eea;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.root-concept-card small {
+    color: #7f8c8d;
+}
+
+.root-concept-card:hover,
+.root-concept-card.selected {
+    border-color: #667eea;
+    background: #f4f6ff;
+}
+
+.root-concept-card[hidden] {
+    display: none;
+}
+
+.root-concept-detail {
+    margin-top: 1.25rem;
+    padding: 1.25rem;
+    border-left: 4px solid #667eea;
+    background: #f8f9fa;
+}
+
+.root-concept-detail h3 {
+    margin: 0 0 0.5rem;
+    color: #2c3e50;
+}
+
+.root-concept-example {
+    padding: 0.85rem 1rem;
+    margin: 1rem 0;
+    background: #fff;
+    font-weight: 700;
+}
+
+.root-concept-steps {
+    display: grid;
+    gap: 0.5rem;
+    padding-left: 0;
+    list-style: none;
+    margin-bottom: 0;
+}
+
+.root-concept-steps li {
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+}
+
+.root-concept-steps li span {
+    display: inline-grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #667eea;
+    color: #fff;
+    font-size: 0.8rem;
+    flex: 0 0 24px;
 }
 
 @media (max-width: 640px) {

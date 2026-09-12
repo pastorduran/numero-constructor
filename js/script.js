@@ -571,6 +571,7 @@ function enterMode(mode) {
         notationGameMode.classList.add('active');
     } else if (mode === 'rootsFree') {
         rootsFreeMode.classList.add('active');
+        if (typeof selectRootConcept === 'function') selectRootConcept('real');
     } else if (mode === 'rootsGame') {
         rootsGameMode.classList.add('active');
         document.getElementById('rootsGameStart').style.display = 'block';
