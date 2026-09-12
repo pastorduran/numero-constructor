@@ -1222,12 +1222,76 @@ button.control-btn[disabled] { opacity:0.55; transform:none; pointer-events:none
 }
 
 .root-operation-picker,
+.root-representation-picker,
 .root-explorer-fields {
     display: flex;
     align-items: flex-end;
     gap: 10px;
     flex-wrap: wrap;
     margin-bottom: 1rem;
+}
+
+.root-representation-picker label {
+    color: #2c3e50;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.root-explorer-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.root-representation-picker select {
+    flex: 1 1 230px;
+    min-width: 180px;
+}
+
+.root-model {
+    margin-top: 1rem;
+    padding: 1rem;
+    border: 2px solid #dfe5ff;
+    border-radius: 10px;
+    background: #fff;
+    color: #2c3e50;
+}
+
+.root-model-title {
+    display: block;
+    margin-bottom: 0.6rem;
+    color: #667eea;
+    font-weight: 700;
+}
+
+.root-square-model {
+    display: grid;
+    grid-template-columns: repeat(5, 24px);
+    gap: 3px;
+    width: max-content;
+    margin: 0.8rem auto;
+}
+
+.root-square-model span {
+    width: 24px;
+    height: 24px;
+    border: 1px solid #667eea;
+    border-radius: 3px;
+    background: #e9edff;
+}
+
+.root-groups {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin-top: 0.75rem;
+}
+
+.root-groups span {
+    padding: 0.4rem 0.65rem;
+    border-radius: 6px;
+    background: #fff1c2;
+    font-weight: 700;
 }
 
 .root-explorer-fields[hidden] {

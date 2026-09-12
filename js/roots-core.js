@@ -4,10 +4,10 @@
             id: 'real',
             title: 'Raíz real',
             text: 'La raíz n-ésima de a es el número b que cumple b^n = a.',
-            example: '√25 = 5 porque 5² = 25.',
+            example: '5 × 5 = 25, por eso √25 = 5.',
             index: 2,
             radicand: 25,
-            steps: ['Identifica el radicando: 25.', 'Busca el número que elevado al cuadrado produce 25.', '√25 = 5.']
+            steps: ['Tenemos 25 baldosas para formar un cuadrado.', 'El cuadrado tiene 5 filas y 5 columnas: 5 × 5 = 25.', 'Por eso, la medida de cada lado es √25 = 5.']
         },
         {
             id: 'existence',
@@ -16,34 +16,34 @@
             example: '√(-9) no es real, pero ∛(-8) = -2.',
             index: 3,
             radicand: -8,
-            steps: ['El índice es impar: 3.', 'Los índices impares admiten radicandos negativos.', '∛(-8) = -2.']
+            steps: ['Mira el índice: 3 es impar.', 'Las raíces impares pueden trabajar con cantidades negativas.', 'Como (-2) × (-2) × (-2) = -8, entonces ∛(-8) = -2.']
         },
         {
             id: 'properties',
             title: 'Propiedades',
             text: 'Producto, cociente, potencia y raíz de una raíz pueden transformarse combinando índices y radicandos.',
-            example: '√a · √b = √(ab) y √[m](√[n]a) = √[mn]a.',
+            example: '√2 · √8 = √16 = 4.',
             index: 2,
             radicand: 16,
-            steps: ['Producto: √a · √b = √(ab).', 'Ejemplo: √2 · √8 = √16.', '√16 = 4.']
+            steps: ['Combina las dos medidas: √2 × √8.', 'Multiplica los radicandos: 2 × 8 = 16.', 'Busca el lado del cuadrado de 16: √16 = 4.']
         },
         {
             id: 'simplify',
             title: 'Simplificación',
             text: 'Extrae del radical los factores que sean potencias perfectas y conserva dentro solo la parte que no se puede extraer.',
-            example: '√72 = √(36 · 2) = 6√2.',
+            example: '72 balones = 36 balones en un grupo cuadrado y 2 sueltos.',
             index: 2,
             radicand: 72,
-            steps: ['Busca un cuadrado perfecto: 72 = 36 × 2.', 'Separa las raíces: √72 = √36 · √2.', 'Resultado: 6√2.']
+            steps: ['Separa 72 en 36 × 2.', 'El grupo de 36 forma un cuadrado de 6 × 6.', '√72 = √36 · √2 = 6√2.']
         },
         {
             id: 'rationalize',
             title: 'Racionalización',
             text: 'Transforma una fracción para que el denominador no contenga raíces.',
-            example: '1/√3 = √3/3.',
+            example: '1/√3 = √3/3: el valor no cambia, pero el denominador queda sin raíz.',
             index: 2,
             radicand: 3,
-            steps: ['Multiplica arriba y abajo por √3.', 'El denominador queda √3 · √3 = 3.', 'Resultado: √3/3.']
+            steps: ['Multiplica arriba y abajo por la misma cantidad: √3/√3 = 1.', 'El denominador queda √3 × √3 = 3.', 'Resultado: 1/√3 = √3/3.']
         }
     ]);
 
@@ -417,6 +417,7 @@
     window.RootsCore = Object.freeze({
         concepts,
         definitions,
+        simplifySquareRoot,
         generateQuestions,
         evaluateFree,
         simplifiedText,
