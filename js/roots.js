@@ -13,6 +13,25 @@ let rootsGameState = {
     specialLevelUnlocked: false
 };
 
+function getRootsHelpContext() {
+    const question = rootsGameState.questions[rootsGameState.currentQuestion];
+    if (!question) return null;
+
+    const help = {
+        exact: ['raíz exacta', 'Busca el número que elevado al índice produce el radicando.', 'Ejemplo: √25 = 5 porque 5² = 25.'],
+        existence: ['existencia en los reales', 'Con índice par, un radicando negativo no tiene raíz real. Con índice impar, sí puede tenerla.', 'Ejemplo: √(-9) no es real, pero ∛(-8) = -2.'],
+        simplify: ['simplificar raíces', 'Busca factores que sean cuadrados perfectos y extráelos fuera del radical.', 'Ejemplo: √72 = √(36 × 2) = 6√2.'],
+        product: ['producto de raíces', 'Combina los radicandos bajo una sola raíz y simplifica el resultado.', 'Ejemplo: √2 · √8 = √16 = 4.'],
+        quotient: ['cociente de raíces', 'Combina numerador y denominador bajo una raíz y simplifica la fracción.', 'Ejemplo: √12 / √3 = √4 = 2.'],
+        nested: ['raíz de una raíz', 'Multiplica los índices para convertir raíces anidadas en una sola raíz.', 'Ejemplo: √(∛64) = √[6]64 = 2.'],
+        power: ['raíz de una potencia', 'La raíz cuadrada principal de un cuadrado es su valor no negativo.', 'Ejemplo: √(6²) = 6.'],
+        rationalize: ['racionalizar un denominador', 'Multiplica por la misma raíz arriba y abajo para eliminarla del denominador.', 'Ejemplo: 1/√3 = √3/3.'],
+        conjugate: ['racionalizar con conjugado', 'Multiplica por el conjugado para aplicar diferencia de cuadrados.', 'Ejemplo: 1/(√2 + √3) se multiplica por (√3 - √2).']
+    }[question.type];
+
+    return help ? { title: `Ayuda: ${help[0]}`, message: help[1], example: help[2] } : null;
+}
+
 function processRootFree() {
     const index = Number(document.getElementById('rootIndexInput').value);
     const radicand = Number(document.getElementById('rootRadicandInput').value);

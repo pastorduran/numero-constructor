@@ -234,6 +234,33 @@ let gameState = {
     specialLevelUnlocked: false
 };
 
+function getCompositionHelpContext() {
+    const question = gameState.questions[gameState.currentQuestion];
+    if (!question) return null;
+
+    if (question.type === 'selector') {
+        return {
+            title: 'Ayuda: valor posicional',
+            message: 'Separa el número por posiciones. Cada contador debe coincidir con la cifra de millones, miles, centenas, decenas o unidades correspondiente.',
+            example: `Ejemplo: ${question.number.toLocaleString('es-CL')} se construye leyendo una cifra por cada posición.`
+        };
+    }
+
+    if (question.type === 'normal') {
+        return {
+            title: 'Ayuda: descomposición normal',
+            message: 'Multiplica cada cifra por el valor de su posición y suma solo los términos cuyo dígito no sea cero.',
+            example: 'Ejemplo: 3.204 = 3 × 1.000 + 2 × 100 + 4 × 1.'
+        };
+    }
+
+    return {
+        title: 'Ayuda: potencias de 10',
+        message: 'Cada posición es una potencia de 10: unidades es 10⁰, decenas es 10¹, centenas es 10² y así sucesivamente.',
+        example: 'Ejemplo: 3.204 = 3 × 10³ + 2 × 10² + 4 × 10⁰.'
+    };
+}
+
 // Iniciar el juego
 function startGame() {
     const saved = getSavedProgress();
@@ -998,6 +1025,33 @@ function loadNotationQuestion() {
             </div>
         `;
     }
+}
+
+function getNotationHelpContext() {
+    const question = notationGameState.questions[notationGameState.currentQuestion];
+    if (!question) return null;
+
+    if (question.type === 'toScientific') {
+        return {
+            title: 'Ayuda: convertir a notación científica',
+            message: 'Mueve la coma hasta dejar un solo dígito distinto de cero antes de ella. La cantidad de lugares indica el exponente.',
+            example: 'Ejemplo: 470.000 = 4,7 × 10⁵.'
+        };
+    }
+
+    if (question.type === 'toNumber') {
+        return {
+            title: 'Ayuda: convertir a número decimal',
+            message: 'Si el exponente es positivo, mueve la coma hacia la derecha. Si es negativo, muévela hacia la izquierda y completa con ceros.',
+            example: 'Ejemplo: 4,7 × 10⁻³ = 0,0047.'
+        };
+    }
+
+    return {
+        title: 'Ayuda: relacionar equivalencias',
+        message: 'Compara el valor decimal con el exponente: una potencia positiva representa un número grande y una negativa, uno pequeño.',
+        example: 'Ejemplo: 48.000.000 = 4,8 × 10⁷.'
+    };
 }
 
 function checkAllMatchesResolved() {

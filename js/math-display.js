@@ -17,7 +17,7 @@ window.MathDisplay = Object.freeze({
             return `${match[0]}<sup>${superscript[match[1]]}</sup>`;
         });
 
-        html = html.replace(/(\d+|√\d+)\/(\d+|√\d+)/g, '<span class="math-fraction"><span class="math-numerator">$1</span><span class="math-denominator">$2</span></span>');
+        html = html.replace(/(\([^()]+\)|\d+|√\d+)\s*\/\s*(\([^()]+\)|\d+|√\d+)/g, '<span class="math-fraction"><span class="math-numerator">$1</span><span class="math-denominator">$2</span></span>');
         return html;
     }
 });

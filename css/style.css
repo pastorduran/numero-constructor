@@ -656,6 +656,41 @@ button.control-btn[disabled] { opacity:0.55; transform:none; pointer-events:none
     text-align: center;
 }
 
+.question-help-row {
+    display: flex;
+    justify-content: flex-end;
+    margin: 0 0 0.35rem;
+}
+
+.help-icon {
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid #d8c46b;
+    border-radius: 50%;
+    background: #fff7d6;
+    color: #765b00;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.help-icon:hover,
+.help-icon:focus-visible {
+    background: #ffefad;
+    box-shadow: 0 3px 10px rgba(118, 91, 0, 0.18);
+    transform: translateY(-1px);
+}
+
+.help-icon:focus-visible {
+    outline: 3px solid rgba(102, 126, 234, 0.35);
+    outline-offset: 2px;
+}
+
 .game-prompt {
     font-size: 16px;
     font-weight: 600;

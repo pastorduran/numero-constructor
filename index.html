@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Constructor de Números - Aprender a Componer</title>
-    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/style.css?v=2">
 </head>
 <body>
     <div class="container">
@@ -144,6 +144,9 @@
                     </div>
                 </div>
 
+                <div class="question-help-row">
+                    <button class="help-icon" title="Ver ayuda del ejercicio" aria-label="Ver ayuda del ejercicio de composición" onclick="ChallengeUI.showChallengeHelp('game', getCompositionHelpContext())">💡</button>
+                </div>
                 <div class="game-question-box">
                     <div class="game-prompt">Compón este número:</div>
                     <div class="game-number" id="gameNumber">0</div>
@@ -265,6 +268,9 @@
                     </div>
                 </div>
 
+                <div class="question-help-row">
+                    <button class="help-icon" title="Ver ayuda del ejercicio" aria-label="Ver ayuda del ejercicio de notación científica" onclick="ChallengeUI.showChallengeHelp('notation', getNotationHelpContext())">💡</button>
+                </div>
                 <div class="game-question-box">
                     <div class="game-prompt" id="notationPrompt"></div>
                     <div class="game-number" id="notationNumber">0</div>
@@ -335,6 +341,7 @@
                     <div class="game-progress-panel"><div class="game-progress">Pregunta <span id="rootsQuestionNum">1</span> de 10</div><div class="progress-track"><div id="rootsProgressFill" class="progress-fill"></div></div></div>
                     <div class="game-score-panel"><div class="game-score">Puntuación: <span id="rootsScoreDisplay">0</span>/10</div><div class="game-stats"><span id="rootsComboBadge" class="stat-pill">Combo x1</span><span id="rootsStreakBadge" class="stat-pill">Racha 0</span><span id="rootsLevelBadge" class="stat-pill level-pill">Nivel 1</span></div></div>
                 </div>
+                <div class="question-help-row"><button class="help-icon" title="Ver ayuda del ejercicio" aria-label="Ver ayuda del ejercicio de raíces" onclick="ChallengeUI.showChallengeHelp('roots', getRootsHelpContext())">💡</button></div>
                 <div class="game-question-box"><div class="game-prompt" id="rootsPrompt"></div></div>
                 <div class="composition-options" id="rootsOptions"></div>
                 <div class="game-actions"><button class="game-btn cancel-btn" onclick="cancelRootsGame()">Cancelar juego</button><button class="game-btn submit-btn" onclick="checkRootsAnswer()">Verificar respuesta</button></div>

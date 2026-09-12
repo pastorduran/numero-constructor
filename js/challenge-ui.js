@@ -1,4 +1,22 @@
 (function () {
+    const helpContent = {
+        game: {
+            title: 'Ayuda: composición',
+            message: 'Cada cifra representa una posición del número. Observa el valor de cada columna y escribe la cantidad correspondiente.',
+            example: 'Ejemplo: 3.204 = 3 × 1.000 + 2 × 100 + 4 × 1.'
+        },
+        notation: {
+            title: 'Ayuda: notación científica',
+            message: 'Escribe el número como un coeficiente entre 1 y 10 multiplicado por una potencia de 10. Cuenta cuántos lugares se mueve la coma.',
+            example: 'Ejemplo: 470.000 = 4,7 × 10⁵.'
+        },
+        roots: {
+            title: 'Ayuda: raíces',
+            message: 'Busca el número que, elevado al índice de la raíz, produce el radicando. Revisa si el índice es par o impar.',
+            example: 'Ejemplo: √25 = 5 porque 5² = 25.'
+        }
+    };
+
     function playClickSound(type = 'add') {
         try {
             const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -111,11 +129,30 @@
         }
     }
 
+    function showChallengeHelp(key, context = {}) {
+        const content = context.title ? context : helpContent[key];
+        if (!content) return;
+
+        document.getElementById('feedbackIcon').textContent = '💡';
+        document.getElementById('feedbackTitle').textContent = content.title;
+        document.getElementById('feedbackMessage').innerHTML = MathDisplay.format(content.message);
+        document.getElementById('feedbackExpression').innerHTML = MathDisplay.format(content.example);
+        document.getElementById('feedbackExpression').style.display = 'block';
+        document.getElementById('feedbackModal').querySelector('.feedback-btn').onclick = closeChallengeHelp;
+        document.getElementById('feedbackModal').style.display = 'flex';
+    }
+
+    function closeChallengeHelp() {
+        document.getElementById('feedbackModal').style.display = 'none';
+    }
+
     window.ChallengeUI = Object.freeze({
         playClickSound,
         triggerConfetti,
         showComboBurst,
         updateChallengeHud,
-        registerAnswerOutcome
+        registerAnswerOutcome,
+        showChallengeHelp,
+        closeChallengeHelp
     });
 })();
