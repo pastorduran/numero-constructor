@@ -80,5 +80,15 @@ window.NotationCore = Object.freeze({
 
     scientificToNumber(coefficient, exponent) {
         return parseFloat(coefficient) * Math.pow(10, parseInt(exponent));
+    },
+
+    scientificToHtml(coefficient, exponent) {
+        const formattedCoefficient = window.MathDisplay.escape(coefficient);
+        const sign = exponent < 0 ? '-' : '';
+        return `${formattedCoefficient} × 10<sup>${sign}${Math.abs(exponent)}</sup>`;
+    },
+
+    formatDisplay(value) {
+        return window.MathDisplay.format(value);
     }
 });

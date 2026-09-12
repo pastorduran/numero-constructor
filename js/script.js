@@ -603,7 +603,7 @@ function processNotationNumber() {
     document.getElementById('notationSpaces').textContent = `Movemos la coma ${steps} lugar(es) a la ${direction}`;
     
     // Resultado final
-    document.getElementById('notationFormula').innerHTML = `${result.scientific}`;
+    document.getElementById('notationFormula').innerHTML = NotationCore.scientificToHtml(result.coefficient, result.exponent);
     
     document.getElementById('notationResult').style.display = 'block';
 }
@@ -877,7 +877,7 @@ function loadNotationQuestion() {
 
         if (question.themed) {
             document.getElementById('notationPrompt').textContent = question.prompt;
-            document.getElementById('notationNumber').textContent = question.displayValue;
+            document.getElementById('notationNumber').innerHTML = MathDisplay.format(question.displayValue);
         } else {
             document.getElementById('notationPrompt').textContent = 'Convierte este número a notación científica:';
             document.getElementById('notationNumber').textContent = question.number.toLocaleString('es-CL', {maximumFractionDigits: 10});
@@ -944,7 +944,7 @@ function loadNotationQuestion() {
             const slot = document.createElement('div');
             slot.className = 'notation-match-slot';
             slot.dataset.matchId = item.id;
-            slot.innerHTML = `<span class="match-slot-target">${item.value}</span>`;
+            slot.innerHTML = `<span class="match-slot-target">${MathDisplay.format(item.value)}</span>`;
             slot.addEventListener('dragover', (event) => {
                 event.preventDefault();
                 if (!slot.classList.contains('match-correct')) {
@@ -960,7 +960,7 @@ function loadNotationQuestion() {
 
                 if (draggedId === correctId) {
                     slot.classList.add('match-correct');
-                    slot.innerHTML = `<span class="match-slot-correct">${item.value}</span>`;
+                    slot.innerHTML = `<span class="match-slot-correct">${MathDisplay.format(item.value)}</span>`;
                     const sourceCard = leftColumn.querySelector(`[data-match-id="${draggedId}"]`);
                     if (sourceCard) {
                         sourceCard.classList.add('matched');
@@ -988,7 +988,7 @@ function loadNotationQuestion() {
             document.getElementById('notationNumber').textContent = question.displayValue;
         } else {
             document.getElementById('notationPrompt').textContent = 'Convierte a número decimal:';
-            document.getElementById('notationNumber').textContent = `${question.coefficient} × 10^${question.exponent}`;
+            document.getElementById('notationNumber').innerHTML = NotationCore.scientificToHtml(question.coefficient, question.exponent);
         }
         
         inputArea.innerHTML = `
@@ -1044,7 +1044,7 @@ function checkNotationAnswer() {
         
         const expected = numberToScientific(notationGameState.currentNumber);
         isCorrect = Math.abs(coeff - parseFloat(expected.coefficient)) < 0.01 && exp === expected.exponent;
-        feedbackExpression = expected.scientific;
+        feedbackExpression = NotationCore.scientificToHtml(expected.coefficient, expected.exponent);
         
         if (isCorrect) {
             notationGameState.correctAnswers++;
@@ -1057,7 +1057,7 @@ function checkNotationAnswer() {
             registerAnswerOutcome(notationGameState, false, 'notation');
             playClickSound('sub');
             const hint = exp === expected.exponent ? 'El coeficiente estaba cerca, pero no en el formato correcto.' : 'Observa cuántos lugares mueve la coma: si el número es grande, el exponente aumenta; si es pequeño, el exponente baja.';
-            showNotationFeedback('❌', 'Incorrecto', `Tu respuesta fue: ${attemptedAnswer}. ${hint} La respuesta correcta es: ${expected.scientific}`, false, feedbackExpression);
+            showNotationFeedback('❌', 'Incorrecto', `Tu respuesta fue: ${attemptedAnswer}. ${hint}`, false, feedbackExpression);
         }
     } else {
         const fullInput = document.getElementById('notationFull').value.trim();
@@ -1077,7 +1077,7 @@ function checkNotationAnswer() {
         
         isCorrect = Math.abs(num - notationGameState.currentNumber) < 0.0001;
         const expectedScientific = numberToScientific(notationGameState.currentNumber);
-        feedbackExpression = expectedScientific.scientific;
+        feedbackExpression = NotationCore.scientificToHtml(expectedScientific.coefficient, expectedScientific.exponent);
         
         if (isCorrect) {
             notationGameState.correctAnswers++;
@@ -1101,7 +1101,7 @@ function showNotationFeedback(icon, title, message, isCorrect, expression = '') 
     const feedbackExpression = document.getElementById('feedbackExpression');
     document.getElementById('feedbackIcon').textContent = icon;
     document.getElementById('feedbackTitle').textContent = title;
-    document.getElementById('feedbackMessage').textContent = message;
+    document.getElementById('feedbackMessage').innerHTML = MathDisplay.format(message);
     
     if (expression) {
         feedbackExpression.innerHTML = `<span class="notation-feedback-formula">${expression}</span>`;

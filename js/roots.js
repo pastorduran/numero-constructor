@@ -22,14 +22,14 @@ function processRootFree() {
     resultBox.classList.remove('root-error');
     if (result.error) {
         resultBox.classList.add('root-error');
-        resultBox.innerHTML = `<strong>Revisa los datos</strong><br>${result.error}`;
+            resultBox.innerHTML = `<strong>Revisa los datos</strong><br>${MathDisplay.format(result.error)}`;
         return;
     }
 
     resultBox.innerHTML = `
-        <strong>${rootsCore.rootText(index, radicand)} = ${result.display}</strong>
-        <p>${result.definition.text}</p>
-        <span>${result.definition.example}</span>
+        <strong>${MathDisplay.format(`${rootsCore.rootText(index, radicand)} = ${result.display}`)}</strong>
+        <p>${MathDisplay.format(result.definition.text)}</p>
+        <span>${MathDisplay.format(result.definition.example)}</span>
     `;
 }
 
@@ -63,11 +63,11 @@ function loadRootsQuestion() {
     rootsGameState.selectedOption = null;
     document.getElementById('rootsQuestionNum').textContent = rootsGameState.currentQuestion + 1;
     document.getElementById('rootsScoreDisplay').textContent = rootsGameState.correctAnswers;
-    document.getElementById('rootsPrompt').textContent = question.prompt;
+    document.getElementById('rootsPrompt').innerHTML = MathDisplay.format(question.prompt);
     rootsUi.updateChallengeHud(rootsGameState, 'roots');
 
     document.getElementById('rootsOptions').innerHTML = question.options.map((option, index) => `
-        <button class="composition-option" onclick="selectRootOption(${index})">${option.label}</button>
+        <button class="composition-option" onclick="selectRootOption(${index})">${MathDisplay.format(option.label)}</button>
     `).join('');
 }
 
@@ -104,9 +104,9 @@ function checkRootsAnswer() {
 function showRootFeedback(icon, title, message, expression) {
     document.getElementById('feedbackIcon').textContent = icon;
     document.getElementById('feedbackTitle').textContent = title;
-    document.getElementById('feedbackMessage').textContent = message;
+    document.getElementById('feedbackMessage').innerHTML = MathDisplay.format(message);
     const expressionElement = document.getElementById('feedbackExpression');
-    expressionElement.innerHTML = expression;
+    expressionElement.innerHTML = MathDisplay.format(expression);
     expressionElement.style.display = expression ? 'block' : 'none';
     document.getElementById('feedbackModal').querySelector('.feedback-btn').onclick = closeRootsFeedback;
     document.getElementById('feedbackModal').style.display = 'flex';
