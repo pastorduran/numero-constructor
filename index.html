@@ -39,6 +39,18 @@
                     <div class="menu-title">Desafío Notación</div>
                     <div class="menu-description">10 preguntas</div>
                 </button>
+
+                <button class="menu-card" onclick="enterMode('rootsFree')">
+                    <div class="menu-icon">√</div>
+                    <div class="menu-title">Raíces Libre</div>
+                    <div class="menu-description">Explora propiedades</div>
+                </button>
+
+                <button class="menu-card" onclick="enterMode('rootsGame')">
+                    <div class="menu-icon">🧩</div>
+                    <div class="menu-title">Desafío Raíces</div>
+                    <div class="menu-description">Progresa por niveles</div>
+                </button>
             </div>
         </div>
 
@@ -281,6 +293,58 @@
             </div>
         </div>
 
+        <!-- MODO RAÍCES: Exploración libre -->
+        <div id="rootsFreeMode" class="mode-content">
+            <div class="section">
+                <div class="section-title">√ Explorador de raíces</div>
+                <div class="notation-input-section">
+                    <div class="input-group">
+                        <label for="rootIndexInput">Índice de la raíz:</label>
+                        <input type="number" id="rootIndexInput" class="notation-input" min="2" value="2">
+                        <label for="rootRadicandInput">Radicando:</label>
+                        <input type="number" id="rootRadicandInput" class="notation-input" value="25">
+                        <button class="btn-primary" onclick="processRootFree()">Calcular raíz</button>
+                    </div>
+                </div>
+                <div id="rootFreeResult" class="notation-result root-result">
+                    Escribe un índice y un radicando para comenzar.
+                </div>
+            </div>
+            <div class="section">
+                <div class="section-title">Conceptos clave</div>
+                <div class="root-definition-grid">
+                    <div class="notation-step"><div class="step-label">Raíz real</div><div class="step-info">La raíz n-ésima de a es el número que elevado a n produce a.</div></div>
+                    <div class="notation-step"><div class="step-label">Existencia</div><div class="step-info">Con índice par, el radicando negativo no produce una raíz real.</div></div>
+                    <div class="notation-step"><div class="step-label">Simplificación</div><div class="step-info">Extrae factores que sean potencias perfectas.</div></div>
+                    <div class="notation-step"><div class="step-label">Racionalización</div><div class="step-info">Elimina raíces del denominador de una fracción.</div></div>
+                </div>
+            </div>
+            <div class="back-menu-btn-wrapper"><button class="back-btn" onclick="backToMenu()">← Volver al menú</button></div>
+        </div>
+
+        <!-- MODO RAÍCES: Desafío -->
+        <div id="rootsGameMode" class="mode-content">
+            <div id="rootsGameStart" class="game-panel">
+                <div class="game-title">√ Desafío de raíces</div>
+                <p class="game-subtitle">Practica definiciones, propiedades, simplificación y racionalización.</p>
+                <div class="game-info"><p>📋 <strong>10 preguntas</strong></p><p>📈 El nivel sube con tu progreso</p><p>🧠 Cada respuesta incluye una explicación</p></div>
+                <button class="game-start-btn" onclick="startRootsGame()">¡Empezar el desafío!</button>
+            </div>
+            <div id="rootsGamePlay" class="game-panel" style="display:none;">
+                <div class="game-header">
+                    <div class="game-progress-panel"><div class="game-progress">Pregunta <span id="rootsQuestionNum">1</span> de 10</div><div class="progress-track"><div id="rootsProgressFill" class="progress-fill"></div></div></div>
+                    <div class="game-score-panel"><div class="game-score">Puntuación: <span id="rootsScoreDisplay">0</span>/10</div><div class="game-stats"><span id="rootsComboBadge" class="stat-pill">Combo x1</span><span id="rootsStreakBadge" class="stat-pill">Racha 0</span><span id="rootsLevelBadge" class="stat-pill level-pill">Nivel 1</span></div></div>
+                </div>
+                <div class="game-question-box"><div class="game-prompt" id="rootsPrompt"></div></div>
+                <div class="composition-options" id="rootsOptions"></div>
+                <div class="game-actions"><button class="game-btn cancel-btn" onclick="cancelRootsGame()">Cancelar juego</button><button class="game-btn submit-btn" onclick="checkRootsAnswer()">Verificar respuesta</button></div>
+            </div>
+            <div id="rootsGameEnd" class="game-panel" style="display:none;">
+                <div class="game-title">¡Desafío terminado!</div><div class="final-score"><div class="score-big" id="rootsFinalScore">0</div><div class="score-text">de 10 preguntas correctas</div></div><div id="rootsFinalMessage" class="final-message"></div>
+                <div class="game-actions"><button class="game-btn" onclick="backToMenu()">← Volver al menú</button><button class="game-btn" onclick="startRootsGame()">Jugar de nuevo</button></div>
+            </div>
+        </div>
+
         <!-- Modal de retroalimentación -->
         <div id="feedbackModal" class="feedback-modal" style="display:none;">
             <div class="feedback-content">
@@ -308,6 +372,13 @@
         </div>
     </div>
 
+    <script src="./js/config.js"></script>
+    <script src="./js/storage.js"></script>
+    <script src="./js/composition-core.js"></script>
+    <script src="./js/notation-core.js"></script>
+    <script src="./js/challenge-ui.js"></script>
+    <script src="./js/roots-core.js"></script>
     <script src="./js/script.js"></script>
+    <script src="./js/roots.js"></script>
 </body>
 </html>

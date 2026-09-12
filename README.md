@@ -88,6 +88,24 @@ http://localhost:8000
 - JavaScript vanilla
 - Diseño responsive y táctil
 
+## Estructura de JavaScript
+
+La aplicación usa capas sencillas sin necesidad de un bundler:
+
+- `js/config.js`: configuración compartida, denominaciones y fábricas de estado inicial.
+- `js/storage.js`: lectura y escritura del progreso en `localStorage`.
+- `js/composition-core.js`: generación de preguntas y respuestas de composición, sin dependencia del DOM.
+- `js/notation-core.js`: conversiones y análisis de números científicos, sin dependencia del DOM.
+- `js/challenge-ui.js`: efectos, HUD, rachas y persistencia visual compartida por los desafíos.
+- `js/roots-core.js`: definiciones, ejercicios progresivos y evaluación de raíces sin dependencia del DOM.
+- `js/roots.js`: modo libre y desafío interactivo de raíces.
+- `js/script.js`: coordinador actual de la interfaz, renderizado y flujo de los modos.
+
+`index.html` carga los archivos en ese orden. Las funciones usadas por los atributos
+`onclick` siguen siendo globales para conservar compatibilidad con la interfaz actual.
+La siguiente extracción natural es separar los renderizadores y los dos juegos en módulos
+propios, manteniendo una API pequeña para este coordinador.
+
 ## Licencia
 
 Este proyecto se distribuye bajo la Licencia MIT. Consulta el archivo LICENSE para más detalles.

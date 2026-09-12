@@ -1,61 +1,22 @@
-// Extracted JS from original file
-const STORAGE_KEY = 'numeroConstructorProgress';
+// Coordinador de la interfaz. Las constantes, el estado base y la persistencia
+// viven en archivos separados para que las nuevas capas puedan crecer sin ampliar este archivo.
+const { denominations, createCompositionState } = window.AppConfig;
+const { getProgress: getSavedProgress, saveSnapshot: saveProgressSnapshot } = window.AppStorage;
+const {
+    generateRandomNumbers,
+    generateExpression,
+    numberToAnswer,
+    createCompositionOptions
+} = window.CompositionCore;
+const {
+    playClickSound,
+    triggerConfetti,
+    showComboBurst,
+    updateChallengeHud,
+    registerAnswerOutcome
+} = window.ChallengeUI;
 
-const denominations = [
-    { value: 10000000, name: 'DiezMillones', color: 'color-teal' },
-    { value: 1000000, name: 'Millones', color: 'color-green' },
-    { value: 100000, name: 'CienMiles', color: 'color-blue' },
-    { value: 10000, name: 'DiezMiles', color: 'color-coral' },
-    { value: 1000, name: 'Miles', color: 'color-purple' },
-    { value: 100, name: 'Centenas', color: 'color-amber' },
-    { value: 10, name: 'Decenas', color: 'color-red' },
-    { value: 1, name: 'Unidades', color: 'color-lime' }
-];
-
-function getSavedProgress() {
-    try {
-        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-        return {
-            compositionLevel: Math.max(1, Number(saved.compositionLevel) || 1),
-            notationLevel: Math.max(1, Number(saved.notationLevel) || 1),
-            bestComposition: Number(saved.bestComposition) || 0,
-            bestNotation: Number(saved.bestNotation) || 0
-        };
-    } catch (e) {
-        return {
-            compositionLevel: 1,
-            notationLevel: 1,
-            bestComposition: 0,
-            bestNotation: 0
-        };
-    }
-}
-
-function saveProgressSnapshot(key, state) {
-    const saved = getSavedProgress();
-    const next = {
-        ...saved,
-        compositionLevel: key === 'game' ? Math.max(saved.compositionLevel, Math.max(1, state.level || 1)) : saved.compositionLevel,
-        notationLevel: key === 'notation' ? Math.max(saved.notationLevel, Math.max(1, state.level || 1)) : saved.notationLevel,
-        bestComposition: key === 'game' ? Math.max(saved.bestComposition, state.correctAnswers || 0) : saved.bestComposition,
-        bestNotation: key === 'notation' ? Math.max(saved.bestNotation, state.correctAnswers || 0) : saved.bestNotation
-    };
-
-    try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-    } catch (e) {}
-}
-
-let state = {
-    10000000: 0,
-    1000000: 0,
-    100000: 0,
-    10000: 0,
-    1000: 0,
-    100: 0,
-    10: 0,
-    1: 0
-};
+let state = createCompositionState();
 
 function render() {
     renderMoney();
@@ -247,33 +208,10 @@ function changeMoney(value, delta) {
     }
 }
 
-// Reproducir un efecto sonoro corto usando WebAudio (no requiere archivos externos)
-function playClickSound(type = 'add') {
-    try {
-        const AudioCtx = window.AudioContext || window.webkitAudioContext;
-        if (!AudioCtx) return;
-        const ctx = new AudioCtx();
-        const o = ctx.createOscillator();
-        const g = ctx.createGain();
-        o.type = 'sine';
-        o.frequency.value = type === 'add' ? 760 : 420;
-        g.gain.value = 0.0001;
-        o.connect(g);
-        g.connect(ctx.destination);
-        const now = ctx.currentTime;
-        g.gain.setValueAtTime(0.0001, now);
-        g.gain.exponentialRampToValueAtTime(0.025, now + 0.01);
-        g.gain.exponentialRampToValueAtTime(0.0001, now + 0.2);
-        o.start(now);
-        o.stop(now + 0.22);
-        setTimeout(() => { try { ctx.close(); } catch (e) {} }, 500);
-    } catch (e) { }
-}
-
 function loadExample(example) { state = { ...example }; render(); }
 
 function resetAll() {
-    state = { 10000000:0,1000000:0,100000:0,10000:0,1000:0,100:0,10:0,1:0 };
+    state = createCompositionState();
     render();
 }
 
@@ -295,267 +233,6 @@ let gameState = {
     level: 1,
     specialLevelUnlocked: false
 };
-
-function triggerConfetti() {
-    const container = document.getElementById('confettiLayer');
-    if (!container) return;
-
-    const colors = ['#ff6b6b', '#ffd166', '#06d6a0', '#4ecdc4', '#5b8def', '#9b5de5', '#f15bb5'];
-    const confettiCount = 32;
-
-    container.innerHTML = '';
-
-    for (let i = 0; i < confettiCount; i++) {
-        const piece = document.createElement('span');
-        piece.className = 'confetti-piece';
-        const angle = (Math.PI * 2 * i) / confettiCount;
-        const radius = 60 + Math.random() * 120;
-        const x = Math.cos(angle) * radius;
-        const y = Math.sin(angle) * radius;
-        const r = (Math.random() * 360) - 180;
-
-        piece.style.background = colors[i % colors.length];
-        piece.style.setProperty('--x', `${x}px`);
-        piece.style.setProperty('--y', `${y}px`);
-        piece.style.setProperty('--r', `${r}deg`);
-
-        container.appendChild(piece);
-    }
-
-    setTimeout(() => {
-        container.innerHTML = '';
-    }, 1200);
-}
-
-function showComboBurst(label, key = 'game', delay = 320) {
-    const burst = document.getElementById('comboBurst');
-    const badge = document.getElementById(`${key}ComboBadge`);
-    if (!burst || !badge) return;
-
-    setTimeout(() => {
-        burst.textContent = label;
-        const rect = badge.getBoundingClientRect();
-        burst.style.left = `${rect.left + rect.width / 2}px`;
-        burst.style.top = `${rect.top - 8}px`;
-        burst.classList.remove('show');
-        void burst.offsetWidth;
-        burst.classList.add('show');
-
-        setTimeout(() => {
-            burst.classList.remove('show');
-        }, 1200);
-    }, delay);
-}
-
-function updateChallengeHud(state, key = 'game') {
-    const totalQuestions = state.questions.length || 10;
-    const progressPercent = (state.currentQuestion / totalQuestions) * 100;
-    const progressFill = document.getElementById(`${key}ProgressFill`);
-    const comboBadge = document.getElementById(`${key}ComboBadge`);
-    const streakBadge = document.getElementById(`${key}StreakBadge`);
-    const levelBadge = document.getElementById(`${key}LevelBadge`);
-
-    if (progressFill) {
-        progressFill.style.width = `${Math.min(progressPercent, 100)}%`;
-    }
-
-    if (comboBadge) {
-        comboBadge.textContent = `Combo x${Math.max(1, state.combo)}`;
-    }
-
-    if (streakBadge) {
-        streakBadge.textContent = `Racha ${state.currentStreak}`;
-    }
-
-    if (levelBadge) {
-        levelBadge.textContent = state.specialLevelUnlocked ? '⭐ Nivel especial' : `Nivel ${state.level}`;
-    }
-}
-
-function registerAnswerOutcome(state, isCorrect, key = 'game') {
-    const previousCombo = state.combo;
-    const previousLevel = state.level;
-
-    if (isCorrect) {
-        state.currentStreak += 1;
-        state.bestStreak = Math.max(state.bestStreak, state.currentStreak);
-        state.combo = Math.max(1, Math.min(5, 1 + Math.floor((state.currentStreak - 1) / 2)));
-        state.level = Math.min(3, Math.max(1, Math.floor(state.correctAnswers / 3) + 1));
-        state.specialLevelUnlocked = state.correctAnswers > 0 && state.correctAnswers % 3 === 0;
-    } else {
-        state.currentStreak = 0;
-        state.combo = 1;
-        state.specialLevelUnlocked = false;
-        state.level = 1;
-    }
-
-    updateChallengeHud(state, key);
-    saveProgressSnapshot(key, state);
-
-    if (isCorrect && state.combo !== previousCombo) {
-        showComboBurst(`¡Poder x${state.combo}!`, key, 320);
-    } else if (isCorrect) {
-        showComboBurst('¡Combo!', key, 320);
-    } else {
-        showComboBurst('Racha 0', key, 320);
-    }
-
-    if (isCorrect && state.level !== previousLevel) {
-        showComboBurst(`¡Nivel ${state.level} desbloqueado!`, key, 620);
-    }
-}
-
-// Generar números aleatorios con énfasis en ceros
-function generateRandomNumbers(level = 1) {
-    const questions = [];
-    const totalQuestions = 10;
-    const questionTypes = ['selector', 'normal', 'exponential', 'selector', 'normal', 'exponential', 'selector', 'normal', 'exponential', 'selector'];
-    const zeroQuestionsCount = 3 + (level >= 2 ? 1 : 0);
-    const normalQuestionsCount = totalQuestions - zeroQuestionsCount;
-    const maxRange = level >= 3 ? 99999999 : 9999999;
-
-    // Preguntas NORMALES (sin énfasis en ceros)
-    for (let i = 0; i < normalQuestionsCount; i++) {
-        let num = 0;
-        while (num === 0 || num > maxRange) {
-            num = Math.floor(Math.random() * (maxRange + 1));
-        }
-        questions.push({ number: num, emphasizeZeros: false });
-    }
-
-    // Preguntas CON ÉNFASIS EN CEROS
-    for (let i = 0; i < zeroQuestionsCount; i++) {
-        let num = generateNumberWithZeros();
-        if (level >= 2) {
-            num = Math.max(1000, num + Math.floor(Math.random() * 50000));
-        }
-        questions.push({ number: num, emphasizeZeros: true });
-    }
-
-    return questions
-        .sort(() => Math.random() - 0.5)
-        .map((question, index) => ({ ...question, type: questionTypes[index] }));
-}
-
-// Generar número con ceros estratégicos (como en la guía)
-function generateNumberWithZeros() {
-    const templates = [
-        // Formato: millones.centenas.miles.unidades
-        [Math.floor(Math.random() * 9) + 1, 0, Math.floor(Math.random() * 9) + 1, Math.floor(Math.random() * 9)],
-        [Math.floor(Math.random() * 9) + 1, Math.floor(Math.random() * 9) + 1, 0, Math.floor(Math.random() * 999)],
-        [Math.floor(Math.random() * 9) + 1, 0, 0, Math.floor(Math.random() * 999)],
-        [Math.floor(Math.random() * 9) + 1, 0, Math.floor(Math.random() * 99) + 1, 0],
-        [Math.floor(Math.random() * 9) + 1, Math.floor(Math.random() * 9) + 1, Math.floor(Math.random() * 99), Math.floor(Math.random() * 9)],
-    ];
-
-    const template = templates[Math.floor(Math.random() * templates.length)];
-    return template[0] * 1000000 + template[1] * 100000 + template[2] * 1000 + template[3];
-}
-
-// Convertir número a respuesta esperada (descomposición)
-function numberToAnswer(num) {
-    const numStr = num.toString().padStart(8, '0');
-    return {
-        10000000: parseInt(numStr[0]),
-        1000000: parseInt(numStr[1]),
-        100000: parseInt(numStr[2]),
-        10000: parseInt(numStr[3]),
-        1000: parseInt(numStr[4]),
-        100: parseInt(numStr[5]),
-        10: parseInt(numStr[6]),
-        1: parseInt(numStr[7])
-    };
-}
-
-// Generar expresión matemática para un número
-function generateExpression(num) {
-    const answer = numberToAnswer(num);
-    
-    const termColorMap = {
-        10000000: 'term-teal',
-        1000000: 'term-green',
-        100000: 'term-blue',
-        10000: 'term-coral',
-        1000: 'term-purple',
-        100: 'term-amber',
-        10: 'term-red',
-        1: 'term-lime'
-    };
-
-    const exponentsMap = {
-        10000000: 7,
-        1000000: 6,
-        100000: 5,
-        10000: 4,
-        1000: 3,
-        100: 2,
-        10: 1,
-        1: 0
-    };
-
-    let termsNormal = [];
-    let termsExponential = [];
-
-    for (const [value, count] of Object.entries(answer)) {
-        const val = parseInt(value);
-        if (count > 0) {
-            const colorClass = termColorMap[val];
-            const exponent = exponentsMap[val];
-            const termNormal = `<span class="expression-term ${colorClass}">${count}×${val.toLocaleString('es-CL')}</span>`;
-            termsNormal.push(termNormal);
-            const termExp = `<span class="expression-term ${colorClass}">${count}×10<sup>${exponent}</sup></span>`;
-            termsExponential.push(termExp);
-        }
-    }
-
-    const expressionN = termsNormal.length > 0 ? termsNormal.join(' <span class="plus">+</span> ') : '0';
-    const expressionE = termsExponential.length > 0 ? termsExponential.join(' <span class="plus">+</span> ') : '0';
-    const resultHtml = `<span class="result">${num.toLocaleString('es-CL')}</span>`;
-
-    return `
-        <div class="expression-form">
-            <div class="form-label">Forma normal</div>
-            ${expressionN} <span class="equals">=</span> ${resultHtml}
-        </div>
-        <div class="expression-form">
-            <div class="form-label">Forma exponencial</div>
-            ${expressionE} <span class="equals">=</span> ${resultHtml}
-        </div>
-    `;
-}
-
-function formatCompositionExpression(answer, type) {
-    const terms = denominations
-        .filter(denom => answer[denom.value] > 0)
-        .map(denom => type === 'normal'
-            ? `${answer[denom.value]} × ${denom.value.toLocaleString('es-CL')}`
-            : `${answer[denom.value]} × 10<sup>${Math.log10(denom.value)}</sup>`
-        );
-
-    return terms.length ? terms.join(' + ') : '0';
-}
-
-function createCompositionOptions(num, type) {
-    const answer = numberToAnswer(num);
-    const incorrectAnswer = { ...answer };
-    const changedDenomination = [...denominations].reverse().find(denom => answer[denom.value] > 0);
-
-    if (changedDenomination) {
-        incorrectAnswer[changedDenomination.value] = (incorrectAnswer[changedDenomination.value] + 1) % 10;
-    }
-
-    const alternateAnswer = { ...answer };
-    const alternateDenomination = denominations.find(denom => answer[denom.value] > 0);
-    if (alternateDenomination) {
-        alternateAnswer[alternateDenomination.value] = (alternateAnswer[alternateDenomination.value] + 2) % 10;
-    }
-
-    return [
-        { expression: formatCompositionExpression(answer, type), correct: true },
-        { expression: formatCompositionExpression(incorrectAnswer, type), correct: false },
-        { expression: formatCompositionExpression(alternateAnswer, type), correct: false }
-    ].sort(() => Math.random() - 0.5);
-}
 
 // Iniciar el juego
 function startGame() {
@@ -831,6 +508,8 @@ function enterMode(mode) {
     const compositionGameMode = document.getElementById('compositionGameMode');
     const notationFreeMode = document.getElementById('notationFreeMode');
     const notationGameMode = document.getElementById('notationGameMode');
+    const rootsFreeMode = document.getElementById('rootsFreeMode');
+    const rootsGameMode = document.getElementById('rootsGameMode');
 
     // Ocultar menú principal
     mainMenu.classList.remove('active');
@@ -840,6 +519,8 @@ function enterMode(mode) {
     if (compositionGameMode) compositionGameMode.classList.remove('active');
     if (notationFreeMode) notationFreeMode.classList.remove('active');
     if (notationGameMode) notationGameMode.classList.remove('active');
+    if (rootsFreeMode) rootsFreeMode.classList.remove('active');
+    if (rootsGameMode) rootsGameMode.classList.remove('active');
 
     // Mostrar modo seleccionado
     if (mode === 'compositionFree') {
@@ -854,6 +535,13 @@ function enterMode(mode) {
         notationFreeMode.classList.add('active');
     } else if (mode === 'notationGame') {
         notationGameMode.classList.add('active');
+    } else if (mode === 'rootsFree') {
+        rootsFreeMode.classList.add('active');
+    } else if (mode === 'rootsGame') {
+        rootsGameMode.classList.add('active');
+        document.getElementById('rootsGameStart').style.display = 'block';
+        document.getElementById('rootsGamePlay').style.display = 'none';
+        document.getElementById('rootsGameEnd').style.display = 'none';
     }
 }
 
@@ -864,112 +552,28 @@ function backToMenu() {
     const compositionGameMode = document.getElementById('compositionGameMode');
     const notationFreeMode = document.getElementById('notationFreeMode');
     const notationGameMode = document.getElementById('notationGameMode');
+    const rootsFreeMode = document.getElementById('rootsFreeMode');
+    const rootsGameMode = document.getElementById('rootsGameMode');
 
     // Ocultar todos los modos
     if (modoFree) modoFree.classList.remove('active');
     if (compositionGameMode) compositionGameMode.classList.remove('active');
     if (notationFreeMode) notationFreeMode.classList.remove('active');
     if (notationGameMode) notationGameMode.classList.remove('active');
+    if (rootsFreeMode) rootsFreeMode.classList.remove('active');
+    if (rootsGameMode) rootsGameMode.classList.remove('active');
 
     // Mostrar menú principal
     mainMenu.classList.add('active');
 }
 
 // ===== NOTACIÓN CIENTÍFICA =====
-
-function normalizeLocaleNumber(value) {
-    if (value === null || value === undefined) return NaN;
-
-    let raw = String(value).trim().replace(/\s+/g, '');
-    if (!raw) return NaN;
-
-    if (raw.includes(',') && raw.includes('.')) {
-        const lastComma = raw.lastIndexOf(',');
-        const lastDot = raw.lastIndexOf('.');
-        if (lastComma > lastDot) {
-            raw = raw.replace(/\./g, '').replace(',', '.');
-        } else {
-            raw = raw.replace(/,/g, '');
-        }
-    } else if (raw.includes(',')) {
-        const parts = raw.split(',');
-        if (parts.length > 2) {
-            raw = raw.replace(/,/g, '');
-        } else {
-            raw = raw.replace(',', '.');
-        }
-    } else if (raw.includes('.')) {
-        const parts = raw.split('.');
-        if (parts.length > 2) {
-            raw = raw.replace(/\./g, '');
-        }
-    }
-
-    const parsed = Number(raw);
-    return Number.isFinite(parsed) ? parsed : NaN;
-}
-
-function parseExponentInput(value) {
-    if (value === null || value === undefined) return NaN;
-
-    let raw = String(value).trim().toLowerCase().replace(/\s+/g, '');
-    if (!raw) return NaN;
-
-    raw = raw.replace(/×/g, 'x');
-    raw = raw.replace(/\^/g, '^');
-
-    const directMatch = /^[-+]?\d+$/.test(raw);
-    if (directMatch) return Number(raw);
-
-    const scientificMatch = /^x?10\^(?:[-+]?\d+)$/.test(raw);
-    if (scientificMatch) {
-        const exponent = raw.replace(/^x?10\^/, '');
-        return Number(exponent);
-    }
-
-    return NaN;
-}
-
-// Convertir número a notación científica
-function numberToScientific(num) {
-    if (num === 0) return { coefficient: 0, exponent: 0, scientific: '0' };
-    
-    const isNegative = num < 0;
-    num = Math.abs(num);
-    
-    let exponent = 0;
-    let coefficient = num;
-    
-    // Para números grandes
-    if (num >= 10) {
-        while (coefficient >= 10) {
-            coefficient /= 10;
-            exponent++;
-        }
-    }
-    // Para números pequeños
-    else if (num < 1) {
-        while (coefficient < 1) {
-            coefficient *= 10;
-            exponent--;
-        }
-    }
-    
-    // Redondear a 2 decimales
-    coefficient = Math.round(coefficient * 100) / 100;
-    
-    const sign = isNegative ? '-' : '';
-    const scientific = `${sign}${coefficient} × 10^${exponent}`;
-    
-    return { coefficient: sign + coefficient, exponent, scientific };
-}
-
-// Convertir notación científica a número
-function scientificToNumber(coefficient, exponent) {
-    const coef = parseFloat(coefficient);
-    const exp = parseInt(exponent);
-    return coef * Math.pow(10, exp);
-}
+const {
+    normalizeLocaleNumber,
+    parseExponentInput,
+    numberToScientific,
+    scientificToNumber
+} = window.NotationCore;
 
 // Procesar número en notación científica (modo libre)
 function processNotationNumber() {
