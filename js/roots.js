@@ -25,8 +25,12 @@ function getRootsHelpContext() {
         quotient: ['cociente de raíces', 'Combina numerador y denominador bajo una raíz y simplifica la fracción.', 'Ejemplo: √12 / √3 = √4 = 2.'],
         nested: ['raíz de una raíz', 'Multiplica los índices para convertir raíces anidadas en una sola raíz.', 'Ejemplo: √(∛64) = √[6]64 = 2.'],
         power: ['raíz de una potencia', 'La raíz cuadrada principal de un cuadrado es su valor no negativo.', 'Ejemplo: √(6²) = 6.'],
+        amplification: ['amplificación de radicales', 'Multiplica el índice por un factor y eleva el radicando por ese mismo factor para conservar el valor.', 'Ejemplo: √2 = √[6]8.'],
+        likeRadicals: ['suma y resta de radicales semejantes', 'Solo se pueden combinar radicales con el mismo índice y el mismo radicando. Suma o resta sus coeficientes.', 'Ejemplo: 2√3 + 5√3 = 7√3.'],
         rationalize: ['racionalizar un denominador', 'Multiplica por la misma raíz arriba y abajo para eliminarla del denominador.', 'Ejemplo: 1/√3 = √3/3.'],
-        conjugate: ['racionalizar con conjugado', 'Multiplica por el conjugado para aplicar diferencia de cuadrados.', 'Ejemplo: 1/(√2 + √3) se multiplica por (√3 - √2).']
+        conjugate: ['racionalizar con conjugado', 'Multiplica por el conjugado para aplicar diferencia de cuadrados.', 'Ejemplo: 1/(√2 + √3) se multiplica por (√3 - √2).'],
+        applied: ['problema aplicado con raíces', 'Identifica la medida desconocida y usa la raíz inversa de la potencia o del área conocida.', 'Ejemplo: si el área de un cuadrado es 49 cm², su lado mide √49 = 7 cm.'],
+        irrationalEquation: ['ecuación irracional', 'Aísla la raíz y eleva ambos lados al índice correspondiente. Comprueba la solución en la ecuación original.', 'Ejemplo: √x = 5 implica x = 5² = 25.']
     }[question.type];
 
     return help ? { title: `Ayuda: ${help[0]}`, message: help[1], example: help[2] } : null;

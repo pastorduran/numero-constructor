@@ -167,6 +167,62 @@
         };
     }
 
+    function createAmplificationQuestion() {
+        const radicand = [2, 3, 5, 7][Math.floor(Math.random() * 4)];
+        const answer = `√[6]${radicand ** 3}`;
+        return {
+            type: 'amplification',
+            prompt: `Amplifica √${radicand} para que tenga índice 6.`,
+            answer,
+            options: optionsFor(answer, [`√[3]${radicand ** 2}`, `√[6]${radicand ** 2}`, `√${radicand ** 6}`]),
+            explanation: `Como 6 = 2 × 3, multiplicamos el índice y elevamos el radicando: √${radicand} = √[6]${radicand ** 3}.`,
+            key: `amplification|${radicand}`
+        };
+    }
+
+    function createLikeRadicalsQuestion() {
+        const coefficientA = Math.floor(Math.random() * 5) + 2;
+        const coefficientB = Math.floor(Math.random() * 5) + 2;
+        const radicand = [2, 3, 5, 7][Math.floor(Math.random() * 4)];
+        const answer = `${coefficientA + coefficientB}√${radicand}`;
+        return {
+            type: 'likeRadicals',
+            prompt: `Reduce ${coefficientA}√${radicand} + ${coefficientB}√${radicand}.`,
+            answer,
+            options: optionsFor(answer, [`${coefficientA * coefficientB}√${radicand}`, `${coefficientA + coefficientB}√${radicand + 1}`, `${coefficientA + coefficientB}`]),
+            explanation: `Son radicales semejantes: se suman los coeficientes y se conserva el radical. ${coefficientA}√${radicand} + ${coefficientB}√${radicand} = ${answer}.`,
+            key: `likeRadicals|${coefficientA}|${coefficientB}|${radicand}`
+        };
+    }
+
+    function createAppliedQuestion() {
+        const side = Math.floor(Math.random() * 9) + 3;
+        const area = side * side;
+        const answer = `${side} cm`;
+        return {
+            type: 'applied',
+            prompt: `Un cuadrado tiene un área de ${area} cm². ¿Cuánto mide cada lado?`,
+            answer,
+            options: optionsFor(answer, [`${area} cm`, `${side + 2} cm`, `${side * 2} cm`]),
+            explanation: `El lado se obtiene calculando la raíz cuadrada del área: √${area} = ${side} cm.`,
+            key: `applied|square|${area}`
+        };
+    }
+
+    function createIrrationalEquationQuestion() {
+        const solution = Math.floor(Math.random() * 8) + 2;
+        const radicand = solution * solution;
+        const answer = `${solution}`;
+        return {
+            type: 'irrationalEquation',
+            prompt: `Resuelve √x = ${solution}.`,
+            answer,
+            options: optionsFor(answer, [`${radicand}`, `${solution + 1}`, `-${solution}`]),
+            explanation: `Elevamos ambos lados al cuadrado: x = ${solution}² = ${radicand}.`,
+            key: `irrationalEquation|${solution}`
+        };
+    }
+
     function createRationalizationQuestion() {
         const radicand = [2, 3, 5, 7][Math.floor(Math.random() * 4)];
         const answer = `√${radicand}/${radicand}`;
@@ -194,10 +250,10 @@
     function createQuestion(level) {
         if (level === 1) return Math.random() > 0.5 ? createExactQuestion() : createExistenceQuestion();
         if (level === 2) {
-            const questions = [createSimplifyQuestion, createProductQuestion, createQuotientQuestion, createNestedQuestion];
+            const questions = [createSimplifyQuestion, createProductQuestion, createQuotientQuestion, createNestedQuestion, createAmplificationQuestion, createLikeRadicalsQuestion];
             return questions[Math.floor(Math.random() * questions.length)]();
         }
-        const questions = [createRationalizationQuestion, createConjugateQuestion, createPowerQuestion, createSimplifyQuestion];
+        const questions = [createRationalizationQuestion, createConjugateQuestion, createPowerQuestion, createSimplifyQuestion, createAppliedQuestion, createIrrationalEquationQuestion];
         return questions[Math.floor(Math.random() * questions.length)]();
     }
 
