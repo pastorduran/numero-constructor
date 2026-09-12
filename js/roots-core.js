@@ -78,6 +78,10 @@
         return [...items].sort(() => Math.random() - 0.5);
     }
 
+    function pick(items) {
+        return items[Math.floor(Math.random() * items.length)];
+    }
+
     function optionsFor(answer, alternatives) {
         return shuffle([...new Set([answer, ...alternatives])]).map(value => ({
             label: value,
@@ -90,26 +94,28 @@
     }
 
     function createExactQuestion() {
-        const value = Math.floor(Math.random() * 11) + 2;
-        const radicand = value * value;
+        const value = pick([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 16, 20, 25]);
+        const index = pick([2, 2, 2, 3]);
+        const radicand = value ** index;
+        const symbol = rootText(index, radicand);
         return {
             type: 'exact',
-            prompt: `Calcula ${rootText(2, radicand)}.`,
+            prompt: pick([`Calcula ${symbol}.`, `Encuentra el valor de ${symbol}.`, `¿Qué número resulta de ${symbol}?`]),
             answer: `${value}`,
             options: optionsFor(`${value}`, [`${value + 1}`, `${value - 1}`, `${radicand}`]),
-            explanation: `${rootText(2, radicand)} = ${value} porque ${value}² = ${radicand}.`,
-            key: `exact|${radicand}|${value}`
+            explanation: `${symbol} = ${value} porque ${value}^${index} = ${radicand}.`,
+            key: `exact|${index}|${radicand}|${value}`
         };
     }
 
     function createExistenceQuestion() {
-        const isEven = Math.random() > 0.35;
-        const radicand = isEven ? -(Math.floor(Math.random() * 8) + 2) : -(Math.floor(Math.random() * 8) + 2);
-        const index = isEven ? 2 : 3;
+        const isEven = Math.random() > 0.5;
+        const index = isEven ? pick([2, 4, 6]) : pick([3, 5]);
+        const radicand = -pick([2, 3, 5, 7, 8, 9, 11, 16, 25]);
         const answer = isEven ? 'No, no es real' : 'Sí, es real';
         return {
             type: 'existence',
-            prompt: `¿${rootText(index, radicand)} pertenece a los números reales?`,
+            prompt: pick([`¿${rootText(index, radicand)} pertenece a los números reales?`, `¿Existe ${rootText(index, radicand)} en ℝ?`, `Clasifica ${rootText(index, radicand)}: ¿es real o no?`]),
             answer,
             options: optionsFor(answer, [isEven ? 'Sí, es real' : 'No, no es real', 'Solo si se cambia el índice']),
             explanation: isEven
@@ -120,13 +126,13 @@
     }
 
     function createSimplifyQuestion() {
-        const inside = Math.floor(Math.random() * 7) + 2;
-        const outside = Math.floor(Math.random() * 4) + 2;
+        const inside = pick([2, 3, 5, 6, 7, 10, 11, 13, 15, 17, 21, 30]);
+        const outside = pick([2, 3, 4, 5, 6, 7, 8, 9]);
         const radicand = outside * outside * inside;
         const answer = simplifiedText(radicand);
         return {
             type: 'simplify',
-            prompt: `Simplifica ${rootText(2, radicand)}.`,
+            prompt: pick([`Simplifica ${rootText(2, radicand)}.`, `Extrae los factores de ${rootText(2, radicand)}.`, `Escribe ${rootText(2, radicand)} en forma reducida.`]),
             answer,
             options: optionsFor(answer, [`${outside}√${inside + 1}`, `√${outside * inside}`, `${outside * inside}`]),
             explanation: `${rootText(2, radicand)} = ${rootText(2, outside * outside)} · ${rootText(2, inside)} = ${answer}.`,
@@ -135,12 +141,12 @@
     }
 
     function createProductQuestion() {
-        const first = Math.floor(Math.random() * 7) + 2;
-        const second = Math.floor(Math.random() * 7) + 2;
+        const first = pick([2, 3, 5, 6, 7, 8, 10, 12, 15, 18, 20]);
+        const second = pick([2, 3, 5, 6, 7, 8, 10, 12, 15, 18, 20]);
         const answer = simplifiedText(first * second);
         return {
             type: 'product',
-            prompt: `Reduce ${rootText(2, first)} · ${rootText(2, second)}.`,
+            prompt: pick([`Reduce ${rootText(2, first)} · ${rootText(2, second)}.`, `Calcula ${rootText(2, first)} · ${rootText(2, second)}.`, `Aplica el producto de radicales: ${rootText(2, first)} · ${rootText(2, second)}.`]),
             answer,
             options: optionsFor(answer, [rootText(2, first + second), `${first + second}`, simplifiedText(first) + simplifiedText(second)]),
             explanation: `√${first} · √${second} = √${first * second} = ${answer}.`,
@@ -149,13 +155,13 @@
     }
 
     function createQuotientQuestion() {
-        const divisor = Math.floor(Math.random() * 5) + 2;
-        const quotient = Math.floor(Math.random() * 5) + 2;
+        const divisor = pick([2, 3, 4, 5, 6, 7, 8, 10, 12]);
+        const quotient = pick([2, 3, 4, 5, 6, 7, 8, 9, 10]);
         const radicand = divisor * quotient;
         const answer = simplifiedText(quotient);
         return {
             type: 'quotient',
-            prompt: `Reduce √${radicand} / √${divisor}.`,
+            prompt: pick([`Reduce √${radicand} / √${divisor}.`, `Calcula √${radicand} / √${divisor}.`, `Aplica el cociente de radicales: √${radicand} / √${divisor}.`]),
             answer,
             options: optionsFor(answer, [`√${radicand - divisor}`, `${radicand / divisor}`, simplifiedText(radicand)]),
             explanation: `√${radicand} / √${divisor} = √(${radicand}/${divisor}) = ${answer}.`,
@@ -164,11 +170,11 @@
     }
 
     function createNestedQuestion() {
-        const value = [8, 27, 64, 125][Math.floor(Math.random() * 4)];
+        const value = pick([64, 729, 4096, 15625, 46656]);
         const answer = `${Math.round(Math.pow(value, 1 / 6))}`;
         return {
             type: 'nested',
-            prompt: `Calcula √(∛${value}).`,
+            prompt: pick([`Calcula √(∛${value}).`, `Reduce la raíz anidada √(∛${value}).`, `Convierte √(∛${value}) en una sola raíz.`]),
             answer,
             options: optionsFor(answer, [`${answer + 1}`, `${Math.round(Math.sqrt(value))}`, `${value}`]),
             explanation: `√(∛${value}) equivale a una raíz sexta: √[6]${value} = ${answer}.`,
@@ -177,11 +183,11 @@
     }
 
     function createPowerQuestion() {
-        const value = Math.floor(Math.random() * 8) + 2;
+        const value = pick([2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15]);
         const answer = `${value}`;
         return {
             type: 'power',
-            prompt: `Calcula √(${value}²).`,
+            prompt: pick([`Calcula √(${value}²).`, `Resuelve √(${value}²).`, `¿Cuál es la raíz principal de ${value}²?`]),
             answer,
             options: optionsFor(answer, [`-${value}`, `${value * value}`, `${value + 2}`]),
             explanation: `La raíz cuadrada principal es no negativa: √(${value}²) = ${value}.`,
@@ -190,22 +196,24 @@
     }
 
     function createAmplificationQuestion() {
-        const radicand = [2, 3, 5, 7][Math.floor(Math.random() * 4)];
-        const answer = `√[6]${radicand ** 3}`;
+        const radicand = pick([2, 3, 5, 6, 7, 10, 11, 13]);
+        const factor = pick([2, 3, 4]);
+        const targetIndex = 2 * factor;
+        const answer = `√[${targetIndex}]${radicand ** factor}`;
         return {
             type: 'amplification',
-            prompt: `Amplifica √${radicand} para que tenga índice 6.`,
+            prompt: `Amplifica √${radicand} para que tenga índice ${targetIndex}.`,
             answer,
-            options: optionsFor(answer, [`√[3]${radicand ** 2}`, `√[6]${radicand ** 2}`, `√${radicand ** 6}`]),
-            explanation: `Como 6 = 2 × 3, multiplicamos el índice y elevamos el radicando: √${radicand} = √[6]${radicand ** 3}.`,
-            key: `amplification|${radicand}`
+            options: optionsFor(answer, [`√[${targetIndex / 2}]${radicand ** 2}`, `√[${targetIndex}]${radicand ** (factor + 1)}`, `√${radicand ** targetIndex}`]),
+            explanation: `Multiplicamos el índice por ${factor} y elevamos el radicando a ${factor}: √${radicand} = ${answer}.`,
+            key: `amplification|${radicand}|${targetIndex}`
         };
     }
 
     function createLikeRadicalsQuestion() {
-        const coefficientA = Math.floor(Math.random() * 5) + 2;
-        const coefficientB = Math.floor(Math.random() * 5) + 2;
-        const radicand = [2, 3, 5, 7][Math.floor(Math.random() * 4)];
+        const coefficientA = pick([2, 3, 4, 5, 6, 7, 8, 10]);
+        const coefficientB = pick([2, 3, 4, 5, 6, 7, 8, 10]);
+        const radicand = pick([2, 3, 5, 6, 7, 10, 11, 13]);
         const answer = `${coefficientA + coefficientB}√${radicand}`;
         return {
             type: 'likeRadicals',
@@ -218,7 +226,7 @@
     }
 
     function createAppliedQuestion() {
-        const side = Math.floor(Math.random() * 9) + 3;
+        const side = pick([3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 18, 20, 25]);
         const area = side * side;
         const answer = `${side} cm`;
         return {
@@ -232,7 +240,7 @@
     }
 
     function createIrrationalEquationQuestion() {
-        const solution = Math.floor(Math.random() * 8) + 2;
+        const solution = pick([2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 20]);
         const radicand = solution * solution;
         const answer = `${solution}`;
         return {
@@ -246,7 +254,7 @@
     }
 
     function createRationalizationQuestion() {
-        const radicand = [2, 3, 5, 7][Math.floor(Math.random() * 4)];
+        const radicand = pick([2, 3, 5, 6, 7, 10, 11, 13, 17, 19]);
         const answer = `√${radicand}/${radicand}`;
         return {
             type: 'rationalize',
