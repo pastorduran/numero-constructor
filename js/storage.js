@@ -6,9 +6,13 @@ window.AppStorage = Object.freeze({
                 compositionLevel: Math.max(1, Number(saved.compositionLevel) || 1),
                 notationLevel: Math.max(1, Number(saved.notationLevel) || 1),
                 rootsLevel: Math.max(1, Number(saved.rootsLevel) || 1),
+                algebraLevel: Math.max(1, Number(saved.algebraLevel) || 1),
+                factorizationLevel: Math.max(1, Number(saved.factorizationLevel) || 1),
                 bestComposition: Number(saved.bestComposition) || 0,
                 bestNotation: Number(saved.bestNotation) || 0,
                 bestRoots: Number(saved.bestRoots) || 0,
+                bestAlgebra: Number(saved.bestAlgebra) || 0,
+                bestFactorization: Number(saved.bestFactorization) || 0,
                 recentQuestions: saved.recentQuestions && typeof saved.recentQuestions === 'object'
                     ? saved.recentQuestions
                     : {},
@@ -21,9 +25,13 @@ window.AppStorage = Object.freeze({
                 compositionLevel: 1,
                 notationLevel: 1,
                 rootsLevel: 1,
+                algebraLevel: 1,
+                factorizationLevel: 1,
                 bestComposition: 0,
                 bestNotation: 0,
                 bestRoots: 0,
+                bestAlgebra: 0,
+                bestFactorization: 0,
                 recentQuestions: {},
                 errorCounts: {}
             };
@@ -37,9 +45,13 @@ window.AppStorage = Object.freeze({
             compositionLevel: key === 'game' ? Math.max(saved.compositionLevel, Math.max(1, state.level || 1)) : saved.compositionLevel,
             notationLevel: key === 'notation' ? Math.max(saved.notationLevel, Math.max(1, state.level || 1)) : saved.notationLevel,
             rootsLevel: key === 'roots' ? Math.max(saved.rootsLevel, Math.max(1, state.level || 1)) : saved.rootsLevel,
+            algebraLevel: key === 'algebra' ? Math.max(saved.algebraLevel, Math.max(1, state.level || 1)) : saved.algebraLevel,
+            factorizationLevel: key === 'factorization' ? Math.max(saved.factorizationLevel, Math.max(1, state.level || 1)) : saved.factorizationLevel,
             bestComposition: key === 'game' ? Math.max(saved.bestComposition, state.correctAnswers || 0) : saved.bestComposition,
             bestNotation: key === 'notation' ? Math.max(saved.bestNotation, state.correctAnswers || 0) : saved.bestNotation,
-            bestRoots: key === 'roots' ? Math.max(saved.bestRoots, state.correctAnswers || 0) : saved.bestRoots
+            bestRoots: key === 'roots' ? Math.max(saved.bestRoots, state.correctAnswers || 0) : saved.bestRoots,
+            bestAlgebra: key === 'algebra' ? Math.max(saved.bestAlgebra, state.correctAnswers || 0) : saved.bestAlgebra,
+            bestFactorization: key === 'factorization' ? Math.max(saved.bestFactorization, state.correctAnswers || 0) : saved.bestFactorization
         };
 
         try {

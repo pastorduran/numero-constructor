@@ -544,6 +544,10 @@ function enterMode(mode) {
     const notationGameMode = document.getElementById('notationGameMode');
     const rootsFreeMode = document.getElementById('rootsFreeMode');
     const rootsGameMode = document.getElementById('rootsGameMode');
+    const algebraFreeMode = document.getElementById('algebraFreeMode');
+    const algebraGameMode = document.getElementById('algebraGameMode');
+    const factorizationFreeMode = document.getElementById('factorizationFreeMode');
+    const factorizationGameMode = document.getElementById('factorizationGameMode');
 
     // Ocultar menú principal
     mainMenu.classList.remove('active');
@@ -555,6 +559,10 @@ function enterMode(mode) {
     if (notationGameMode) notationGameMode.classList.remove('active');
     if (rootsFreeMode) rootsFreeMode.classList.remove('active');
     if (rootsGameMode) rootsGameMode.classList.remove('active');
+    if (algebraFreeMode) algebraFreeMode.classList.remove('active');
+    if (algebraGameMode) algebraGameMode.classList.remove('active');
+    if (factorizationFreeMode) factorizationFreeMode.classList.remove('active');
+    if (factorizationGameMode) factorizationGameMode.classList.remove('active');
 
     // Mostrar modo seleccionado
     if (mode === 'compositionFree') {
@@ -577,6 +585,24 @@ function enterMode(mode) {
         document.getElementById('rootsGameStart').style.display = 'block';
         document.getElementById('rootsGamePlay').style.display = 'none';
         document.getElementById('rootsGameEnd').style.display = 'none';
+    } else if (mode === 'algebraFree') {
+        algebraFreeMode.classList.add('active');
+        if (typeof renderAlgebraConceptGrid === 'function') renderAlgebraConceptGrid();
+        if (typeof updateAlgebraExplorerFields === 'function') updateAlgebraExplorerFields();
+    } else if (mode === 'algebraGame') {
+        algebraGameMode.classList.add('active');
+        document.getElementById('algebraGameStart').style.display = 'block';
+        document.getElementById('algebraGamePlay').style.display = 'none';
+        document.getElementById('algebraGameEnd').style.display = 'none';
+    } else if (mode === 'factorizationFree') {
+        factorizationFreeMode.classList.add('active');
+        if (typeof renderFactorizationConceptGrid === 'function') renderFactorizationConceptGrid();
+        if (typeof updateFactorizationExplorerFields === 'function') updateFactorizationExplorerFields();
+    } else if (mode === 'factorizationGame') {
+        factorizationGameMode.classList.add('active');
+        document.getElementById('factorizationGameStart').style.display = 'block';
+        document.getElementById('factorizationGamePlay').style.display = 'none';
+        document.getElementById('factorizationGameEnd').style.display = 'none';
     }
 }
 
@@ -589,6 +615,10 @@ function backToMenu() {
     const notationGameMode = document.getElementById('notationGameMode');
     const rootsFreeMode = document.getElementById('rootsFreeMode');
     const rootsGameMode = document.getElementById('rootsGameMode');
+    const algebraFreeMode = document.getElementById('algebraFreeMode');
+    const algebraGameMode = document.getElementById('algebraGameMode');
+    const factorizationFreeMode = document.getElementById('factorizationFreeMode');
+    const factorizationGameMode = document.getElementById('factorizationGameMode');
 
     // Ocultar todos los modos
     if (modoFree) modoFree.classList.remove('active');
@@ -597,6 +627,10 @@ function backToMenu() {
     if (notationGameMode) notationGameMode.classList.remove('active');
     if (rootsFreeMode) rootsFreeMode.classList.remove('active');
     if (rootsGameMode) rootsGameMode.classList.remove('active');
+    if (algebraFreeMode) algebraFreeMode.classList.remove('active');
+    if (algebraGameMode) algebraGameMode.classList.remove('active');
+    if (factorizationFreeMode) factorizationFreeMode.classList.remove('active');
+    if (factorizationGameMode) factorizationGameMode.classList.remove('active');
 
     // Mostrar menú principal
     mainMenu.classList.add('active');

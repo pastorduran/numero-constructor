@@ -100,6 +100,10 @@ La aplicación usa capas sencillas sin necesidad de un bundler:
 - `js/challenge-ui.js`: efectos, HUD, rachas y persistencia visual compartida por los desafíos.
 - `js/roots-core.js`: definiciones, ejercicios progresivos y evaluación de raíces sin dependencia del DOM.
 - `js/roots.js`: modo libre y desafío interactivo de raíces.
+- `js/algebra-core.js`: generación de preguntas y evaluación del módulo de álgebra sin dependencia del DOM.
+- `js/algebra.js`: explorador y desafío del módulo de álgebra.
+- `js/factorization-core.js`: generación de preguntas y evaluación del módulo de factorización sin dependencia del DOM.
+- `js/factorization.js`: explorador y desafío del módulo de factorización.
 - `js/math-display.js`: presentación de expresiones matemáticas con fracciones y superíndices.
 - `modulos-educativos.instructions.md`: guía general para crear nuevos módulos educativos.
 - `js/script.js`: coordinador actual de la interfaz, renderizado y flujo de los modos.

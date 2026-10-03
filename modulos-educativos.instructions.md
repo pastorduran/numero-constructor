@@ -95,3 +95,43 @@ Antes de considerar terminado un módulo:
 Las instrucciones generales describen cómo construir módulos. Las definiciones, propiedades,
 ejemplos y errores frecuentes de cada tema deben vivir en la documentación específica del
 módulo o en su archivo de contenido, no en esta guía general.
+
+## Explorador interactivo
+
+Cada módulo puede incluir un explorador con operaciones seleccionables. Cuando se usa:
+
+- Organizar las operaciones en categorías pedagógicas mediante `optgroup`.
+- Sincronizar el panel de conceptos con la operación seleccionada.
+- Mostrar únicamente la tarjeta conceptual asociada, ocultando las demás.
+- Cargar valores de ejemplo coherentes con la operación elegida.
+- Ofrecer una progresión guiada de pasos sin mostrar términos pedagógicos técnicos.
+- El botón principal debe cambiar entre `Comenzar explicación`, `Ver siguiente paso`
+  y `Reiniciar explicación`.
+
+La progresión debe pasar por tres representaciones internas sin que el estudiante tenga
+que elegirlas: concreta, pictórica y abstracta. El lenguaje visible debe ser natural y
+cercano, no técnico.
+
+## Contextos y ejemplos
+
+Los ejemplos deben ser comprensibles y cercanos al público objetivo. Preferir contextos
+de la vida cotidiana como deportes, objetos, situaciones escolares o juegos, en lugar de
+contextos abstractos o demasiado técnicos.
+
+Cada explicación debe incluir:
+
+- Una relación explícita (por ejemplo, `5 × 5 = 25` antes de `√25 = 5`).
+- Pasos numerados que conecten la situación con el símbolo.
+- El resultado final como una fórmula matemática clara.
+
+## Formato matemático
+
+Las expresiones matemáticas deben renderizarse con superíndices y fracciones visuales
+mediante `math-display.js`. Los campos de entrada pueden seguir siendo texto simple,
+pero el feedback, las explicaciones y los resultados deben mostrar el formato correcto.
+
+## Ayuda contextual
+
+El botón de ayuda debe estar fuera del panel del enunciado, encima y alineado a la derecha.
+Cada ayuda debe ser específica del tipo de ejercicio actual, no genérica del módulo.
+Debe incluir el concepto, una explicación breve y un ejemplo matemático.

@@ -51,6 +51,30 @@
                     <div class="menu-title">Desafío Raíces</div>
                     <div class="menu-description">Progresa por niveles</div>
                 </button>
+
+                <button class="menu-card" onclick="enterMode('algebraFree')">
+                    <div class="menu-icon">🔤</div>
+                    <div class="menu-title">Álgebra Libre</div>
+                    <div class="menu-description">Explora expresiones</div>
+                </button>
+
+                <button class="menu-card" onclick="enterMode('algebraGame')">
+                    <div class="menu-icon">📝</div>
+                    <div class="menu-title">Desafío Álgebra</div>
+                    <div class="menu-description">Progresa por niveles</div>
+                </button>
+
+                <button class="menu-card" onclick="enterMode('factorizationFree')">
+                    <div class="menu-icon">🧬</div>
+                    <div class="menu-title">Factorización Libre</div>
+                    <div class="menu-description">Explora métodos</div>
+                </button>
+
+                <button class="menu-card" onclick="enterMode('factorizationGame')">
+                    <div class="menu-icon">🔍</div>
+                    <div class="menu-title">Desafío Factorización</div>
+                    <div class="menu-description">Progresa por niveles</div>
+                </button>
             </div>
         </div>
 
@@ -430,6 +454,152 @@
             </div>
         </div>
 
+        <!-- MODO ÁLGEBRA: Exploración libre -->
+        <div id="algebraFreeMode" class="mode-content">
+            <div class="section">
+                <div class="section-title">🔤 Taller de álgebra</div>
+                <div class="notation-input-section">
+                    <div class="root-operation-picker">
+                        <label for="algebraOperationSelect">¿Qué quieres explorar?</label>
+                        <select id="algebraOperationSelect" class="notation-input" onchange="updateAlgebraExplorerFields()">
+                            <optgroup label="Fundamentos">
+                                <option value="translate">Traducir del español al álgebra</option>
+                                <option value="evaluate">Valorizar una expresión</option>
+                            </optgroup>
+                            <optgroup label="Operaciones">
+                                <option value="simplify">Reducir términos semejantes</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    <div class="root-explorer-fields" data-algebra-fields="translate">
+                        <span class="root-operation-example">«El doble de un número»</span>
+                    </div>
+                    <div class="root-explorer-fields" data-algebra-fields="evaluate" hidden>
+                        <label for="algebraEvaluateExpressionInput">Expresión:</label><input type="text" id="algebraEvaluateExpressionInput" class="notation-input" value="3x + 5">
+                        <label for="algebraEvaluateValueInput">Valor de x:</label><input type="number" id="algebraEvaluateValueInput" class="notation-input" value="2">
+                    </div>
+                    <div class="root-explorer-fields" data-algebra-fields="simplify" hidden>
+                        <label for="algebraSimplifyAInput">Primer coeficiente:</label><input type="number" id="algebraSimplifyAInput" class="notation-input" value="5">
+                        <label for="algebraSimplifyBInput">Segundo coeficiente:</label><input type="number" id="algebraSimplifyBInput" class="notation-input" value="3">
+                    </div>
+                    <div class="root-explorer-actions">
+                        <button class="btn-primary" id="algebraNextStepButton" onclick="advanceAlgebraExplorer()">Comenzar explicación</button>
+                    </div>
+                </div>
+                <div id="algebraFreeResult" class="notation-result root-result">
+                    Elige una operación para comenzar.
+                </div>
+            </div>
+            <div class="section">
+                <div class="section-title">Conceptos clave</div>
+                <div class="root-definition-grid" id="algebraConceptGrid"></div>
+                <div class="root-concept-detail">
+                    <h3 id="algebraConceptTitle">Lenguaje algebraico</h3>
+                    <p id="algebraConceptText"></p>
+                    <div class="root-concept-example" id="algebraConceptExample"></div>
+                    <ol id="algebraConceptSteps" class="root-concept-steps"></ol>
+                </div>
+            </div>
+            <div class="back-menu-btn-wrapper"><button class="back-btn" onclick="backToMenu()">← Volver al menú</button></div>
+        </div>
+
+        <!-- MODO ÁLGEBRA: Desafío -->
+        <div id="algebraGameMode" class="mode-content">
+            <div id="algebraGameStart" class="game-panel">
+                <div class="game-title">🔤 Desafío de álgebra</div>
+                <p class="game-subtitle">Practica traducción, valorización y reducción de términos.</p>
+                <div class="game-info"><p>📋 <strong>10 preguntas</strong></p><p>📈 El nivel sube con tu progreso</p><p>🧠 Cada respuesta incluye una explicación</p></div>
+                <button class="game-start-btn" onclick="startAlgebraGame()">¡Empezar el desafío!</button>
+            </div>
+            <div id="algebraGamePlay" class="game-panel" style="display:none;">
+                <div class="game-header">
+                    <div class="game-progress-panel"><div class="game-progress">Pregunta <span id="algebraQuestionNum">1</span> de 10</div><div class="progress-track"><div id="algebraProgressFill" class="progress-fill"></div></div></div>
+                    <div class="game-score-panel"><div class="game-score">Puntuación: <span id="algebraScoreDisplay">0</span>/10</div><div class="game-stats"><span id="algebraComboBadge" class="stat-pill">Combo x1</span><span id="algebraStreakBadge" class="stat-pill">Racha 0</span><span id="algebraLevelBadge" class="stat-pill level-pill">Nivel 1</span></div></div>
+                </div>
+                <div class="question-help-row"><button class="help-icon" title="Ver ayuda del ejercicio" aria-label="Ver ayuda del ejercicio de álgebra" onclick="ChallengeUI.showChallengeHelp('algebra', getAlgebraHelpContext())">💡</button></div>
+                <div class="game-question-box"><div class="game-prompt" id="algebraPrompt"></div></div>
+                <div class="composition-options" id="algebraOptions"></div>
+                <div class="game-actions"><button class="game-btn cancel-btn" onclick="cancelAlgebraGame()">Cancelar juego</button><button class="game-btn submit-btn" onclick="checkAlgebraAnswer()">Verificar respuesta</button></div>
+            </div>
+            <div id="algebraGameEnd" class="game-panel" style="display:none;">
+                <div class="game-title">¡Desafío terminado!</div><div class="final-score"><div class="score-big" id="algebraFinalScore">0</div><div class="score-text">de 10 preguntas correctas</div></div><div id="algebraFinalMessage" class="final-message"></div>
+                <div class="game-actions"><button class="game-btn" onclick="backToMenu()">← Volver al menú</button><button class="game-btn" onclick="startAlgebraGame()">Jugar de nuevo</button></div>
+            </div>
+        </div>
+
+        <!-- MODO FACTORIZACIÓN: Exploración libre -->
+        <div id="factorizationFreeMode" class="mode-content">
+            <div class="section">
+                <div class="section-title">🧬 Taller de factorización</div>
+                <div class="notation-input-section">
+                    <div class="root-operation-picker">
+                        <label for="factorizationOperationSelect">¿Qué quieres explorar?</label>
+                        <select id="factorizationOperationSelect" class="notation-input" onchange="updateFactorizationExplorerFields()">
+                            <optgroup label="Métodos básicos">
+                                <option value="commonFactor">Extraer factor común</option>
+                            </optgroup>
+                            <optgroup label="Trinomios">
+                                <option value="perfectTrinomial">Trinomio cuadrado perfecto</option>
+                                <option value="trialError">Ensayo y error</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    <div class="root-explorer-fields" data-factorization-fields="commonFactor">
+                        <label for="factorizationCommonAInput">Primer coeficiente:</label><input type="number" id="factorizationCommonAInput" class="notation-input" min="1" value="6">
+                        <label for="factorizationCommonBInput">Segundo coeficiente:</label><input type="number" id="factorizationCommonBInput" class="notation-input" min="1" value="6">
+                    </div>
+                    <div class="root-explorer-fields" data-factorization-fields="perfectTrinomial" hidden>
+                        <label for="factorizationPerfectRootInput">Raíz del binomio:</label><input type="number" id="factorizationPerfectRootInput" class="notation-input" min="2" value="2">
+                    </div>
+                    <div class="root-explorer-fields" data-factorization-fields="trialError" hidden>
+                        <label for="factorizationTrialNInput">Primer número:</label><input type="number" id="factorizationTrialNInput" class="notation-input" min="1" value="2">
+                        <label for="factorizationTrialMInput">Segundo número:</label><input type="number" id="factorizationTrialMInput" class="notation-input" min="1" value="3">
+                    </div>
+                    <div class="root-explorer-actions">
+                        <button class="btn-primary" id="factorizationNextStepButton" onclick="advanceFactorizationExplorer()">Comenzar explicación</button>
+                    </div>
+                </div>
+                <div id="factorizationFreeResult" class="notation-result root-result">
+                    Elige una operación para comenzar.
+                </div>
+            </div>
+            <div class="section">
+                <div class="section-title">Conceptos clave</div>
+                <div class="root-definition-grid" id="factorizationConceptGrid"></div>
+                <div class="root-concept-detail">
+                    <h3 id="factorizationConceptTitle">Factor común</h3>
+                    <p id="factorizationConceptText"></p>
+                    <div class="root-concept-example" id="factorizationConceptExample"></div>
+                    <ol id="factorizationConceptSteps" class="root-concept-steps"></ol>
+                </div>
+            </div>
+            <div class="back-menu-btn-wrapper"><button class="back-btn" onclick="backToMenu()">← Volver al menú</button></div>
+        </div>
+
+        <!-- MODO FACTORIZACIÓN: Desafío -->
+        <div id="factorizationGameMode" class="mode-content">
+            <div id="factorizationGameStart" class="game-panel">
+                <div class="game-title">🧬 Desafío de factorización</div>
+                <p class="game-subtitle">Practica factor común, agrupación y trinomios.</p>
+                <div class="game-info"><p>📋 <strong>10 preguntas</strong></p><p>📈 El nivel sube con tu progreso</p><p>🧠 Cada respuesta incluye una explicación</p></div>
+                <button class="game-start-btn" onclick="startFactorizationGame()">¡Empezar el desafío!</button>
+            </div>
+            <div id="factorizationGamePlay" class="game-panel" style="display:none;">
+                <div class="game-header">
+                    <div class="game-progress-panel"><div class="game-progress">Pregunta <span id="factorizationQuestionNum">1</span> de 10</div><div class="progress-track"><div id="factorizationProgressFill" class="progress-fill"></div></div></div>
+                    <div class="game-score-panel"><div class="game-score">Puntuación: <span id="factorizationScoreDisplay">0</span>/10</div><div class="game-stats"><span id="factorizationComboBadge" class="stat-pill">Combo x1</span><span id="factorizationStreakBadge" class="stat-pill">Racha 0</span><span id="factorizationLevelBadge" class="stat-pill level-pill">Nivel 1</span></div></div>
+                </div>
+                <div class="question-help-row"><button class="help-icon" title="Ver ayuda del ejercicio" aria-label="Ver ayuda del ejercicio de factorización" onclick="ChallengeUI.showChallengeHelp('factorization', getFactorizationHelpContext())">💡</button></div>
+                <div class="game-question-box"><div class="game-prompt" id="factorizationPrompt"></div></div>
+                <div class="composition-options" id="factorizationOptions"></div>
+                <div class="game-actions"><button class="game-btn cancel-btn" onclick="cancelFactorizationGame()">Cancelar juego</button><button class="game-btn submit-btn" onclick="checkFactorizationAnswer()">Verificar respuesta</button></div>
+            </div>
+            <div id="factorizationGameEnd" class="game-panel" style="display:none;">
+                <div class="game-title">¡Desafío terminado!</div><div class="final-score"><div class="score-big" id="factorizationFinalScore">0</div><div class="score-text">de 10 preguntas correctas</div></div><div id="factorizationFinalMessage" class="final-message"></div>
+                <div class="game-actions"><button class="game-btn" onclick="backToMenu()">← Volver al menú</button><button class="game-btn" onclick="startFactorizationGame()">Jugar de nuevo</button></div>
+            </div>
+        </div>
+
         <!-- Modal de retroalimentación -->
         <div id="feedbackModal" class="feedback-modal" style="display:none;">
             <div class="feedback-content">
@@ -464,7 +634,11 @@
     <script src="./js/notation-core.js"></script>
     <script src="./js/challenge-ui.js"></script>
     <script src="./js/roots-core.js"></script>
+    <script src="./js/algebra-core.js"></script>
+    <script src="./js/factorization-core.js"></script>
     <script src="./js/script.js"></script>
     <script src="./js/roots.js"></script>
+    <script src="./js/algebra.js"></script>
+    <script src="./js/factorization.js"></script>
 </body>
 </html>

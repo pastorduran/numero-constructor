@@ -14,6 +14,16 @@
             title: 'Ayuda: raíces',
             message: 'Busca el número que, elevado al índice de la raíz, produce el radicando. Revisa si el índice es par o impar.',
             example: 'Ejemplo: √25 = 5 porque 5² = 25.'
+        },
+        algebra: {
+            title: 'Ayuda: álgebra',
+            message: 'Identifica la cantidad desconocida, asígnale una letra y traduce las operaciones del enunciado.',
+            example: 'Ejemplo: «el doble de un número» → 2x.'
+        },
+        factorization: {
+            title: 'Ayuda: factorización',
+            message: 'Busca lo que todos los términos comparten y escríbelo fuera del paréntesis.',
+            example: 'Ejemplo: 6x + 6y = 6(x + y).'
         }
     };
 
