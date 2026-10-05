@@ -69,18 +69,20 @@ function renderFactorizationRepresentation(operation, representation, result) {
     if (operation === 'commonFactor') {
         const a = Number(document.getElementById('factorizationCommonAInput').value);
         const b = Number(document.getElementById('factorizationCommonBInput').value);
+        const gcd = (x, y) => y === 0 ? x : gcd(y, x % y);
+        const factor = gcd(a, b);
         if (representation === 'concrete') {
-            return `<div class="root-model"><strong class="root-model-title">Agrupa lo que comparten</strong><p>Tienes ${a}x y ${b}y. Ambos números se dividen por el mismo factor.</p><div class="root-groups"><span>${a}x</span><span>+</span><span>${b}y</span></div><strong>Busca el número que los dos comparten.</strong></div>`;
+            return `<div class="root-model"><strong class="root-model-title">Agrupa lo que comparten</strong><p>Tienes ${a}x y ${b}y. Ambos números se dividen por ${factor}.</p><div class="root-groups"><span>${a}x</span><span>+</span><span>${b}y</span></div><strong>Busca el número que los dos comparten: ${factor}.</strong></div>`;
         }
-        return `<div class="root-model"><strong class="root-model-title">Escribe la multiplicación</strong><p>El factor común va fuera y lo que queda va dentro del paréntesis.</p><strong>${MathDisplay.format(`Resultado: ${result.display}`)}</strong></div>`;
+        return `<div class="root-model"><strong class="root-model-title">Escribe la multiplicación</strong><p>El factor común ${factor} va fuera y lo que queda va dentro del paréntesis.</p><div class="factor-rectangle-model"><div class="region-factor">${factor}</div><div class="region-inner">(${a / factor}x + ${b / factor}y)</div></div><strong>${MathDisplay.format(`Resultado: ${result.display}`)}</strong></div>`;
     }
 
     if (operation === 'perfectTrinomial') {
         const root = Number(document.getElementById('factorizationPerfectRootInput').value);
         if (representation === 'concrete') {
-            return `<div class="root-model"><strong class="root-model-title">Construye un cuadrado</strong><p>Imagina un cuadrado de lado (x + ${root}). Su área tiene cuatro partes: un cuadrado grande, dos rectángulos iguales y un cuadrado pequeño.</p><div class="root-groups"><span>x²</span><span>+</span><span>2 · x · ${root}</span><span>+</span><span>${root * root}</span></div><strong>Todo junto forma (x + ${root})².</strong></div>`;
+            return `<div class="root-model"><strong class="root-model-title">Construye un cuadrado</strong><p>Imagina un cuadrado de lado (x + ${root}). Su área se divide en cuatro regiones:</p><div class="factor-square-model"><div class="region-x2">x²</div><div class="region-xr">x · ${root}</div><div class="region-xr">x · ${root}</div><div class="region-r2">${root}²</div></div><div class="root-groups"><span>x²</span><span>+</span><span>2 · x · ${root}</span><span>+</span><span>${root * root}</span></div><strong>Todo junto forma (x + ${root})².</strong></div>`;
         }
-        return `<div class="root-model"><strong class="root-model-title">Comprueba las raíces</strong><p>Las raíces del primero y tercer término son x y ${root}. El del medio es su doble producto.</p><strong>${MathDisplay.format(`Resultado: ${result.display}`)}</strong></div>`;
+        return `<div class="root-model"><strong class="root-model-title">Comprueba las raíces</strong><p>Las raíces del primero y tercer término son x y ${root}. El del medio es su doble producto.</p><div class="factor-square-model"><div class="region-x2">x²</div><div class="region-xr">x · ${root}</div><div class="region-xr">x · ${root}</div><div class="region-r2">${root}²</div></div><strong>${MathDisplay.format(`Resultado: ${result.display}`)}</strong></div>`;
     }
 
     if (operation === 'trialError') {
@@ -89,7 +91,7 @@ function renderFactorizationRepresentation(operation, representation, result) {
         if (representation === 'concrete') {
             return `<div class="root-model"><strong class="root-model-title">Busca dos números que funcionen</strong><p>Necesitas dos números que sumen ${n + m} y multipliquen ${n * m}.</p><div class="root-groups"><span>? + ? = ${n + m}</span><span>? × ? = ${n * m}</span></div><strong>Prueba con pares de números hasta encontrar la combinación correcta.</strong></div>`;
         }
-        return `<div class="root-model"><strong class="root-model-title">Comprueba los números</strong><p>${n} y ${m} suman ${n + m} y multiplican ${n * m}.</p><strong>${MathDisplay.format(`Resultado: ${result.display}`)}</strong></div>`;
+        return `<div class="root-model"><strong class="root-model-title">Comprueba los números</strong><p>${n} y ${m} suman ${n + m} y multiplican ${n * m}.</p><div class="factor-rectangle-model"><div class="region-factor">x + ${n}</div><div class="region-factor">x + ${m}</div><div class="region-inner">x² + ${n + m}x + ${n * m}</div></div><strong>${MathDisplay.format(`Resultado: ${result.display}`)}</strong></div>`;
     }
 
     return `<div class="root-model"><strong class="root-model-title">Observa la transformación</strong><p>Sigue el paso a paso para entender la operación.</p><strong>${MathDisplay.format(`Resultado: ${result.display}`)}</strong></div>`;
