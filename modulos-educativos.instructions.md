@@ -134,4 +134,4 @@ pero el feedback, las explicaciones y los resultados deben mostrar el formato co
 
 El botón de ayuda debe estar fuera del panel del enunciado, encima y alineado a la derecha.
 Cada ayuda debe ser específica del tipo de ejercicio actual, no genérica del módulo.
-Debe incluir el concepto, una explicación breve y un ejemplo matemático.
+Debe incluir el concepto, una explicación breve y un ejemplo matemático asociado al tema tratado.
