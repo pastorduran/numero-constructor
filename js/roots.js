@@ -394,23 +394,16 @@ function checkRootsAnswer() {
         rootsUi.registerAnswerOutcome(rootsGameState, true, 'roots');
         rootsUi.playClickSound('add');
         rootsUi.triggerConfetti();
-        showRootFeedback('✅', '¡Correcto!', question.explanation, question.answer);
+        showRootFeedback('✅', '¡Correcto!', question, question.answer);
     } else {
         rootsUi.registerAnswerOutcome(rootsGameState, false, 'roots', question.type);
         rootsUi.playClickSound('sub');
-        showRootFeedback('❌', 'Incorrecto', question.explanation, `Respuesta correcta: ${question.answer}`);
+        showRootFeedback('❌', 'Incorrecto', question, `Respuesta correcta: ${question.answer}`);
     }
 }
 
-function showRootFeedback(icon, title, message, expression) {
-    document.getElementById('feedbackIcon').textContent = icon;
-    document.getElementById('feedbackTitle').textContent = title;
-    document.getElementById('feedbackMessage').innerHTML = MathDisplay.format(message);
-    const expressionElement = document.getElementById('feedbackExpression');
-    expressionElement.innerHTML = MathDisplay.format(expression);
-    expressionElement.style.display = expression ? 'block' : 'none';
-    document.getElementById('feedbackModal').querySelector('.feedback-btn').onclick = closeRootsFeedback;
-    document.getElementById('feedbackModal').style.display = 'flex';
+function showRootFeedback(icon, title, question, expression) {
+    rootsUi.showAnswerFeedback({ icon, title, question, expression, onContinue: closeRootsFeedback });
 }
 
 function showRootValidationWarning() {

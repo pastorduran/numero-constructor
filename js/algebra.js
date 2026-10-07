@@ -242,23 +242,16 @@ function checkAlgebraAnswer() {
         algebraUi.registerAnswerOutcome(algebraGameState, true, 'algebra');
         algebraUi.playClickSound('add');
         algebraUi.triggerConfetti();
-        showAlgebraFeedback('✅', '¡Correcto!', question.explanation, question.answer);
+        showAlgebraFeedback('✅', '¡Correcto!', question, question.answer);
     } else {
         algebraUi.registerAnswerOutcome(algebraGameState, false, 'algebra', question.type);
         algebraUi.playClickSound('sub');
-        showAlgebraFeedback('❌', 'Incorrecto', question.explanation, `Respuesta correcta: ${question.answer}`);
+        showAlgebraFeedback('❌', 'Incorrecto', question, `Respuesta correcta: ${question.answer}`);
     }
 }
 
-function showAlgebraFeedback(icon, title, message, expression) {
-    document.getElementById('feedbackIcon').textContent = icon;
-    document.getElementById('feedbackTitle').textContent = title;
-    document.getElementById('feedbackMessage').innerHTML = MathDisplay.format(message);
-    const expressionElement = document.getElementById('feedbackExpression');
-    expressionElement.innerHTML = MathDisplay.format(expression);
-    expressionElement.style.display = expression ? 'block' : 'none';
-    document.getElementById('feedbackModal').querySelector('.feedback-btn').onclick = closeAlgebraFeedback;
-    document.getElementById('feedbackModal').style.display = 'flex';
+function showAlgebraFeedback(icon, title, question, expression) {
+    algebraUi.showAnswerFeedback({ icon, title, question, expression, onContinue: closeAlgebraFeedback });
 }
 
 function showAlgebraValidationWarning() {

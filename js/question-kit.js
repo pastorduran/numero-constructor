@@ -64,14 +64,27 @@
             } else if (/[a-zA-Z]/.test(ch)) {
                 tokens.push({ t: 'var', v: ch });
                 i++;
-            } else if (Object.prototype.hasOwnProperty.call(SUP_INDEX, ch)) {
+            } else if (ch === '√' || ch === '∛' || ch === '∜') {
+                let n = ch === '√' ? 2 : ch === '∛' ? 3 : 4;
+                i++;
+                if (ch === '√' && s[i] === '[') {
+                    const close = s.indexOf(']', i);
+                    n = close < 0 ? NaN : parseInt(s.slice(i + 1, close), 10);
+                    if (!(n >= 2)) throw new Error('Índice de raíz no válido');
+                    i = close + 1;
+                }
+                tokens.push({ t: 'root', n });
+            } else if (ch === '⁻' || Object.prototype.hasOwnProperty.call(SUP_INDEX, ch)) {
                 let j = i;
+                let negative = false;
+                if (s[j] === '⁻') { negative = true; j++; }
                 let digits = '';
                 while (j < s.length && Object.prototype.hasOwnProperty.call(SUP_INDEX, s[j])) {
                     digits += SUP_INDEX[s[j]];
                     j++;
                 }
-                tokens.push({ t: 'sup', v: parseInt(digits, 10) });
+                if (!digits) throw new Error('Exponente no válido');
+                tokens.push({ t: 'sup', v: (negative ? -1 : 1) * parseInt(digits, 10) });
                 i = j;
             } else if ('+-*/^()'.includes(ch)) {
                 tokens.push({ t: 'op', v: ch });
@@ -81,6 +94,11 @@
             }
         }
         return tokens;
+    }
+
+    function nthRoot(x, n) {
+        if (n % 2 === 1) return Math.sign(x) * Math.pow(Math.abs(x), 1 / n);
+        return x < 0 ? NaN : Math.pow(x, 1 / n);
     }
 
     function compile(source) {
@@ -113,7 +131,7 @@
                     pos++;
                     const right = parseUnary();
                     left = t.v === '*' ? env => l(env) * right(env) : env => l(env) / right(env);
-                } else if (t.t === 'var' || (t.t === 'op' && t.v === '(')) {
+                } else if (t.t === 'var' || t.t === 'root' || (t.t === 'op' && t.v === '(')) {
                     const right = parsePower();
                     left = env => l(env) * right(env);
                 } else {
@@ -146,9 +164,21 @@
                     base = env => Math.pow(b(env), t.v);
                 } else if (isOp('^')) {
                     pos++;
-                    const n = tokens[pos++];
-                    if (!n || n.t !== 'num') throw new Error('Exponente no válido');
-                    base = env => Math.pow(b(env), n.v);
+                    let expFn;
+                    if (isOp('(')) {
+                        pos++;
+                        const inner = parseExpression();
+                        if (!isOp(')')) throw new Error('Falta cerrar un paréntesis');
+                        pos++;
+                        expFn = inner;
+                    } else {
+                        let sign = 1;
+                        if (isOp('-')) { pos++; sign = -1; }
+                        const n = tokens[pos++];
+                        if (!n || n.t !== 'num') throw new Error('Exponente no válido');
+                        expFn = () => sign * n.v;
+                    }
+                    base = env => Math.pow(b(env), expFn(env));
                 } else {
                     break;
                 }
@@ -160,6 +190,11 @@
             const t = tokens[pos++];
             if (!t) throw new Error('Expresión incompleta');
             if (t.t === 'num') return () => t.v;
+            if (t.t === 'root') {
+                const radicand = parseAtom();
+                const n = t.n;
+                return env => nthRoot(radicand(env), n);
+            }
             if (t.t === 'var') {
                 const name = t.v;
                 vars.add(name);
@@ -287,6 +322,15 @@
 
     /* ---------- Conjunto de preguntas sin repeticiones ---------- */
 
+    // Divide una explicación en pasos (una oración por paso) cuando la pregunta no trae `steps`.
+    function toSteps(text) {
+        return String(text)
+            .replace(/([.!?])\s+(?=[A-ZÁÉÍÓÚÑ¿¡«])/g, '$1\n')
+            .split('\n')
+            .map(part => part.trim())
+            .filter(Boolean);
+    }
+
     const failures = {};
 
     function noteFailure(error) {
@@ -305,7 +349,9 @@
             const maker = r.pick(pool);
             let q;
             try { q = maker(r); } catch (error) { noteFailure(error); return null; }
-            return q && accept(q.key) ? { maker, q } : null;
+            if (!q || !accept(q.key)) return null;
+            if (!q.steps || !q.steps.length) q.steps = toSteps(q.explanation);
+            return { maker, q };
         }
 
         while (questions.length < total) {
@@ -327,6 +373,6 @@
     window.QuestionKit = Object.freeze({
         makeRandom, gcd, compile, evaluate, equivalent, assertEquivalent,
         sup, lit, renderTerms, poly, polyAdd, polyScale, polyShift, polyMul,
-        buildOptions, generateSet, failures
+        buildOptions, generateSet, toSteps, failures
     });
 })();

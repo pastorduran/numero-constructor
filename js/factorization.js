@@ -245,23 +245,16 @@ function checkFactorizationAnswer() {
         factorizationUi.registerAnswerOutcome(factorizationGameState, true, 'factorization');
         factorizationUi.playClickSound('add');
         factorizationUi.triggerConfetti();
-        showFactorizationFeedback('✅', '¡Correcto!', question.explanation, question.answer);
+        showFactorizationFeedback('✅', '¡Correcto!', question, question.answer);
     } else {
         factorizationUi.registerAnswerOutcome(factorizationGameState, false, 'factorization', question.type);
         factorizationUi.playClickSound('sub');
-        showFactorizationFeedback('❌', 'Incorrecto', question.explanation, `Respuesta correcta: ${question.answer}`);
+        showFactorizationFeedback('❌', 'Incorrecto', question, `Respuesta correcta: ${question.answer}`);
     }
 }
 
-function showFactorizationFeedback(icon, title, message, expression) {
-    document.getElementById('feedbackIcon').textContent = icon;
-    document.getElementById('feedbackTitle').textContent = title;
-    document.getElementById('feedbackMessage').innerHTML = MathDisplay.format(message);
-    const expressionElement = document.getElementById('feedbackExpression');
-    expressionElement.innerHTML = MathDisplay.format(expression);
-    expressionElement.style.display = expression ? 'block' : 'none';
-    document.getElementById('feedbackModal').querySelector('.feedback-btn').onclick = closeFactorizationFeedback;
-    document.getElementById('feedbackModal').style.display = 'flex';
+function showFactorizationFeedback(icon, title, question, expression) {
+    factorizationUi.showAnswerFeedback({ icon, title, question, expression, onContinue: closeFactorizationFeedback });
 }
 
 function showFactorizationValidationWarning() {

@@ -153,6 +153,33 @@
         document.getElementById('feedbackModal').style.display = 'flex';
     }
 
+    // Pasos numerados (mismo markup que el explorador: <ol class="root-concept-steps">).
+    function renderSteps(steps) {
+        const items = steps.map((step, index) =>
+            `<li><span>${index + 1}</span>${MathDisplay.format(step)}</li>`
+        ).join('');
+        return `<ol class="root-concept-steps challenge-feedback-steps" style="text-align:left;margin:0;">${items}</ol>`;
+    }
+
+    // Modal de respuesta común a todos los desafíos: muestra la solución paso a paso.
+    // question: { steps?: string[], explanation?: string }. Si no hay steps, usa explanation.
+    function showAnswerFeedback({ icon, title, question, expression, onContinue }) {
+        const steps = question && Array.isArray(question.steps) && question.steps.length
+            ? question.steps
+            : (question && question.explanation ? [question.explanation] : []);
+
+        document.getElementById('feedbackIcon').textContent = icon;
+        document.getElementById('feedbackTitle').textContent = title;
+        document.getElementById('feedbackMessage').innerHTML = steps.length
+            ? `<div class="feedback-steps-scroll" style="max-height:45vh;overflow-y:auto;padding-right:4px;">${renderSteps(steps)}</div>`
+            : '';
+        const expressionElement = document.getElementById('feedbackExpression');
+        expressionElement.innerHTML = MathDisplay.format(expression || '');
+        expressionElement.style.display = expression ? 'block' : 'none';
+        document.getElementById('feedbackModal').querySelector('.feedback-btn').onclick = onContinue;
+        document.getElementById('feedbackModal').style.display = 'flex';
+    }
+
     function closeChallengeHelp() {
         document.getElementById('feedbackModal').style.display = 'none';
     }
@@ -164,6 +191,8 @@
         updateChallengeHud,
         registerAnswerOutcome,
         showChallengeHelp,
-        closeChallengeHelp
+        closeChallengeHelp,
+        renderSteps,
+        showAnswerFeedback
     });
 })();

@@ -17,7 +17,13 @@ window.MathDisplay = Object.freeze({
             return `${match[0]}<sup>${superscript[match[1]]}</sup>`;
         });
 
-        html = html.replace(/(\([^()]+\)|\d+|√\d+)\s*\/\s*(\([^()]+\)|\d+|√\d+)/g, '<span class="math-fraction"><span class="math-numerator">$1</span><span class="math-denominator">$2</span></span>');
+        // Fracciones: el coeficiente que acompaña a una raíz o a un paréntesis queda dentro
+        // de la fracción (2√5/15, 3(√7 + √5)/2), para que no se lea como número mixto.
+        const operand = '(?:\\d*(?:\\([^()]+\\)|√\\d+)|\\d+)';
+        html = html.replace(new RegExp(`(${operand})\\s*\\/\\s*(${operand})`, 'g'), '<span class="math-fraction"><span class="math-numerator">$1</span><span class="math-denominator">$2</span></span>');
+
+        // Índice de la raíz: √[4]81 se dibuja con el 4 pequeño sobre el radical.
+        html = html.replace(/√\[(\d+)\]/g, '<sup class="math-index">$1</sup>√');
         return html;
     }
 });
